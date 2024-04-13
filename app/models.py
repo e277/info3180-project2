@@ -31,7 +31,7 @@ class User(db.Model):
     profile_photo = db.Column(db.String(80))
     joined_on = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __init__(self, username, password, firstname, lastname, email, location, biography):
+    def __init__(self, username, password, firstname, lastname, email, location, biography, profile_photo):
         self.username = username
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
         self.firstname = firstname

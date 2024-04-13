@@ -22,7 +22,7 @@ from werkzeug.utils import secure_filename
 def index():
     return jsonify(message="This is the beginning of our API")
 
-app.config['WTF_CSRF_ENABLED'] = False #Comment out
+
 @app.route('/api/v1/register', methods=['POST'])
 def register():
     form = RegisterForm()  
@@ -34,33 +34,34 @@ def register():
         email = form.email.data
         location = form.location.data
         biography = form.biography.data
-        """profile_photo = form.profile_photo.data
+        profile_photo = form.profile_photo.data
         
-        # Save profile photo
         filename = secure_filename(profile_photo.filename)
-        profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))"""
+        profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
-        new_user = User(
-            username=username,
-            password=password,
-            firstname=firstname,
-            lastname=lastname,
-            email=email,
-            location=location,
-            biography=biography
-            #profile_photo = filename
-        )
-        
-        db.session.add(new_user)
-        db.session.commit() 
-        
-        return jsonify({"message": "User registered successfully"}), 200
+        try:
+            new_user = User(
+                username=username,
+                password=password,
+                firstname=firstname,
+                lastname=lastname,
+                email=email,
+                location=location,
+                biography=biography,
+                profile_photo = filename
+            )
+            
+            db.session.add(new_user)
+            db.session.commit() 
+            return jsonify({"message": "User registered successfully"}), 200
+        except Exception as e:
+            return jsonify({"errors": str(e)}), 400
     else:
         errors = form.errors 
-        C
+        return jsonify({"errors": errors}), 400
 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/api/v1/auth/login', methods=['POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -69,24 +70,26 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user is not None and check_password_hash(user.password, password):
             login_user(user)
-            flash('Login successful!', 'success')
             return jsonify({"message": "User logged in successfully"}), 200
         else:
-            #flash('Invalid username or password', 'danger')
-            return jsonify({"message": "User registered successfully"}), 200
+            return jsonify({"message": "Invalid credentials"}), 400
+    return jsonify({"errors": form.errors}), 400
 
-@app.route(("/logout"))
+@app.route("/api/v1/auth/logout", methods=['POST'])
 @login_required
 def logout():
-    logout_user()
-    flash('Logout successful!', 'success')
-    return redirect(url_for("home"))
+    try: 
+        logout_user()
+        return jsonify({"message": "User logged out successfully"}), 200
+    except Exception as e:
+        return jsonify({"errors": str(e)}), 400
+
     
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
 @login_manager.user_loader
 def load_user(id):
-    return db.session.execute(db.select(UserProfile).filter_by(id=id)).scalar()
+    return db.session.execute(db.select(User).filter_by(id=id)).scalar()
 
 
 ###
