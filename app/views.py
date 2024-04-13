@@ -9,6 +9,7 @@ from app import app
 from flask import render_template, request, jsonify, send_file
 import os
 from app.models import User, Like, Follow
+from app.forms import PostForm, LikeForm, FollowForm, UserForm
 
 
 ###
@@ -18,6 +19,44 @@ from app.models import User, Like, Follow
 @app.route('/')
 def index():
     return jsonify(message="This is the beginning of our API")
+
+@app.route('/api/v1/users/{user_id}/posts', methods=['POST'])
+# @auth.login_required
+def add_posts(user_id):
+    # Used for adding posts to the users feed
+    post = PostForm()
+    # get user id from authentification
+    if request.method == 'POST' and post.validate_on_submit():
+        caption = post.caption.data
+        photo = post.photo.data
+        user_id = post.user_id.data
+        created_on = post.created_on.data
+        return jsonify(message="Post added successfully", caption=caption, photo=photo, user_id=user_id, created_on=created_on)
+    
+
+@app.route('/api/v1/users/{user_id}/posts', methods=['GET'])
+# @auth.login_required
+def get_posts(user_id):
+    # Returns a user's posts
+    pass
+
+@app.route('/api/users/{user_id}/follow', methods=['POST'])
+# @auth.login_required
+def follow_user(user_id):
+    # Create a Follow relationship between the current user and the target user.
+    pass
+
+@app.route('/api/v1/posts', methods=['GET'])
+# @auth.login_required
+def get_all_posts():
+    # Return all posts for all users
+    pass
+    
+app.route('/api/v1/posts/{post_id}/like', methods=['POST'])
+# @auth.login_required
+def like_post(post_id):
+    # Set a like on the current Post by the logged in User
+    pass
 
 
 ###
