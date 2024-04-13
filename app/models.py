@@ -2,6 +2,20 @@ from . import db
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 
+class Post(db.Model):
+
+    __tablename__ = "Posts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    caption = db.Column(db.String(80))
+    photo = db.Column(db.String(80))
+    user_id = db.Column(db.Integer)
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __init__(self, caption, user_id):
+        self.caption = caption
+        self.photo = photo
+        self.user_id = user_id
 
 class User(db.Model):
     __tablename__ = 'Users'
@@ -9,19 +23,19 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(128))
-    first_name = db.Column(db.String(80))
-    last_name = db.Column(db.String(80))
+    firstname = db.Column(db.String(80))
+    lastname = db.Column(db.String(80))
     email = db.Column(db.String(80))
     location = db.Column(db.String(80))
-    biography = db.Column(db.String(80))
+    biography = db.Column(db.String(1000))
     profile_photo = db.Column(db.String(80))
     joined_on = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __init__(self, username, password, first_name, last_name, email, location, biography, profile_photo):
+    def __init__(self, username, password, firstname, lastname, email, location, biography):
         self.username = username
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
-        self.first_name = first_name
-        self.last_name = last_name
+        self.firstname = firstname
+        self.lastname = lastname
         self.email = email
         self.location = location
         self.biography = biography

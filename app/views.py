@@ -5,11 +5,14 @@ Werkzeug Documentation:  https://werkzeug.palletsprojects.com/
 This file creates your application.
 """
 
-from app import app
-from flask import render_template, request, jsonify, send_file
+from app import app, db, login_manager
+from flask import render_template, request, jsonify, send_file, flash, redirect, url_for
 import os
 from app.models import User, Like, Follow
 from app.forms import PostForm, LikeForm, FollowForm, UserForm
+from werkzeug.security import check_password_hash
+from flask_login import login_user, logout_user, current_user, login_required
+from werkzeug.utils import secure_filename
 
 
 ###
@@ -20,43 +23,76 @@ from app.forms import PostForm, LikeForm, FollowForm, UserForm
 def index():
     return jsonify(message="This is the beginning of our API")
 
-@app.route('/api/v1/users/{user_id}/posts', methods=['POST'])
-# @auth.login_required
-def add_posts(user_id):
-    # Used for adding posts to the users feed
-    post = PostForm()
-    # get user id from authentification
-    if request.method == 'POST' and post.validate_on_submit():
-        caption = post.caption.data
-        photo = post.photo.data
-        user_id = post.user_id.data
-        created_on = post.created_on.data
-        return jsonify(message="Post added successfully", caption=caption, photo=photo, user_id=user_id, created_on=created_on)
+app.config['WTF_CSRF_ENABLED'] = False #Comment out
+@app.route('/api/v1/register', methods=['POST'])
+def register():
+    form = UserForm()  
+    if form.validate():  
+        username = form.username.data
+        password = form.password.data
+        firstname = form.firstname.data
+        lastname = form.lastname.data
+        email = form.email.data
+        location = form.location.data
+        biography = form.biography.data
+        """profile_photo = form.profile_photo.data
+        
+        # Save profile photo
+        filename = secure_filename(profile_photo.filename)
+        profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))"""
+        
+        new_user = User(
+            username=username,
+            password=password,
+            firstname=firstname,
+            lastname=lastname,
+            email=email,
+            location=location,
+            biography=biography
+            #profile_photo = filename
+        )
+        
+        db.session.add(new_user)
+        db.session.commit() 
+        
+        return jsonify({"message": "User registered successfully"}), 200
+    else:
+        errors = form.errors 
+        
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    form = UserForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        user = User.query.filter_by(username=username).first()
+        if user is not None and check_password_hash(user.password, password):
+            login_user(user)
+            flash('Login successful!', 'success')
+            return jsonify({"message": "User logged in successfully"}), 200
+        else:
+            #flash('Invalid username or password', 'danger')
+            return jsonify({"message": "User registered successfully"}), 200
+
+@app.route(("/logout"))
+@login_required
+def logout():
+    logout_user()
+    flash('Logout successful!', 'success')
+    return redirect(url_for("home"))
     
+# user_loader callback. This callback is used to reload the user object from
+# the user ID stored in the session
+@login_manager.user_loader
+def load_user(id):
+    return db.session.execute(db.select(UserProfile).filter_by(id=id)).scalar()
 
-@app.route('/api/v1/users/{user_id}/posts', methods=['GET'])
-# @auth.login_required
-def get_posts(user_id):
-    # Returns a user's posts
-    pass
 
-@app.route('/api/users/{user_id}/follow', methods=['POST'])
-# @auth.login_required
-def follow_user(user_id):
-    # Create a Follow relationship between the current user and the target user.
-    pass
 
-@app.route('/api/v1/posts', methods=['GET'])
-# @auth.login_required
-def get_all_posts():
-    # Return all posts for all users
-    pass
-    
-app.route('/api/v1/posts/{post_id}/like', methods=['POST'])
-# @auth.login_required
-def like_post(post_id):
-    # Set a like on the current Post by the logged in User
-    pass
+
+
 
 
 ###

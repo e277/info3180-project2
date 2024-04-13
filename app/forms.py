@@ -1,8 +1,8 @@
 # Add any form classes for Flask-WTF here
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, TextAreaField, IntegerField
-from wtforms.validators import InputRequired
+from wtforms import StringField, TextAreaField, IntegerField, PasswordField
+from wtforms.validators import InputRequired, Length, Email
 
 class PostForm(FlaskForm):
     caption = TextAreaField('Caption', validators=[InputRequired()])
@@ -28,3 +28,18 @@ class UserForm:
     biography = TextAreaField('Biography', validators=[InputRequired()])
     profile_photo = FileField('ProfilePhoto', validators=[FileRequired(), FileAllowed(['jpg', 'png'], 'Images only!')])
     joined_on = StringField('JoinedOn', validators=[InputRequired()])
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired()])
+    password = PasswordField('Password', validators=[InputRequired()])
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(max=80)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=128)])
+    firstname = StringField('First Name', validators=[InputRequired(), Length(max=80)])
+    lastname = StringField('Last Name', validators=[InputRequired(), Length(max=80)])
+    email = StringField('Email', validators=[InputRequired(), Email(), Length(max=80)])
+    location = StringField('Location', validators=[Length(max=80)])
+    biography = StringField('Biography', validators=[Length(max=1000)])
+    profile_photo = FileField('File', 
+                    validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
