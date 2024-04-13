@@ -73,7 +73,7 @@ def login():
             return jsonify({"message": "User logged in successfully"}), 200
         else:
             #flash('Invalid username or password', 'danger')
-    return jsonify({"message": "User registered successfully"}), 200
+            return jsonify({"message": "User registered successfully"}), 200
 
 @app.route(("/logout"))
 @login_required

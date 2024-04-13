@@ -1,8 +1,8 @@
 # Add any form classes for Flask-WTF here
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, TextAreaField, IntegerField
-from wtforms.validators import InputRequired
+from wtforms import StringField, TextAreaField, IntegerField, PasswordField
+from wtforms.validators import InputRequired, Length, Email
 
 class PostForm(FlaskForm):
     caption = TextAreaField('Caption', validators=[InputRequired()])

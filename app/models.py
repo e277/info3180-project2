@@ -2,6 +2,20 @@ from . import db
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 
+class Post(db.Model):
+
+    __tablename__ = "Posts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    caption = db.Column(db.String(80))
+    photo = db.Column(db.String(80))
+    user_id = db.Column(db.Integer)
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __init__(self, caption, user_id):
+        self.caption = caption
+        self.photo = photo
+        self.user_id = user_id
 
 class User(db.Model):
     __tablename__ = 'Users'
@@ -25,7 +39,7 @@ class User(db.Model):
         self.email = email
         self.location = location
         self.biography = biography
-        #self.profile_photo = profile_photo
+        self.profile_photo = profile_photo
         
     def is_authenticated(self):
         return True
