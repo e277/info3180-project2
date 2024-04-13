@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from "vue";
-
 </script>
 
 <template>
@@ -19,7 +18,7 @@ import { ref } from "vue";
 </template>
 
 <style>
-.homesquares{
+    .homesquares{
         display:flex;
         flex-direction:row;
         margin:60px;
