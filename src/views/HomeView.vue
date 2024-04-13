@@ -4,16 +4,16 @@ import { ref } from "vue";
 
 <template>
     <div class="homesquares">
-        <img src="uploads/wallpaper.jpeg" alt="Photogram Logo" width="30" height="30" class="home1">
-        <div class = "information">
-            <span class="navbar-brand"><img src="uploads/cam.png" alt="Photogram Logo" width="30" height="30" class="d-inline-block align-top">Photogram</span>
-            <hr>
-            <p>Share photos of your favourite moments with friends, family and the world.</p>
-            <div class ="options">
-              <button class="reg">Register</button>
-              <button class="log">Login</button>
+            <img src="../assets/wallpaper.jpeg" alt="Photogram Logo" width="30" height="30" class="home1">
+            <div class = "information">
+                <span class="navbar-brand"><img src="../assets/cam.png" alt="Photogram Logo" width="30" height="30" class="d-inline-block align-top">Photogram</span>
+                <hr>
+                <p>Share photos of your favourite moments with friends, family and the world.</p>
+                <div class ="options">
+                    <button class="reg">Register</button>
+                    <button class="log">Login</button>
+                </div>
             </div>
-        </div>
     </div>
 </template>
 
