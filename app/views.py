@@ -6,12 +6,13 @@ This file creates your application.
 """
 
 from app import app, db, login_manager
-from flask import render_template, request, jsonify, send_file, flash, redirect, url_for
+from flask import render_template, request, jsonify, send_file, url_for
 import os
-from app.models import User, Like, Follow
+from app.models import User, Like, Follow, Post
 from app.forms import PostForm, LikeForm, FollowForm, UserForm
-from werkzeug.security import check_password_hash
+from datetime import datetime
 from flask_login import login_user, logout_user, current_user, login_required
+from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 
 
@@ -35,21 +36,21 @@ def register():
         email = form.email.data
         location = form.location.data
         biography = form.biography.data
-        """profile_photo = form.profile_photo.data
+        profile_photo = form.profile_photo.data
         
         # Save profile photo
         filename = secure_filename(profile_photo.filename)
-        profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))"""
+        profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
         new_user = User(
-            username=username,
-            password=password,
-            firstname=firstname,
-            lastname=lastname,
-            email=email,
-            location=location,
-            biography=biography
-            #profile_photo = filename
+            username = username,
+            password = password,
+            firstname = firstname,
+            lastname = lastname,
+            email = email,
+            location = location,
+            biography = biography,
+            profile_photo = filename
         )
         
         db.session.add(new_user)
@@ -70,28 +71,73 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user is not None and check_password_hash(user.password, password):
             login_user(user)
-            flash('Login successful!', 'success')
             return jsonify({"message": "User logged in successfully"}), 200
         else:
-            #flash('Invalid username or password', 'danger')
             return jsonify({"message": "User registered successfully"}), 200
 
 @app.route(("/logout"))
 @login_required
 def logout():
     logout_user()
-    flash('Logout successful!', 'success')
-    return redirect(url_for("home"))
+    return jsonify({"message": "User logged out successfully"}), 200
     
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
 @login_manager.user_loader
 def load_user(id):
-    return db.session.execute(db.select(UserProfile).filter_by(id=id)).scalar()
+    return db.session.execute(db.select(User).filter_by(id=id)).scalar()
 
 
+@app.route('/api/v1/users/<int:user_id>/posts', methods=['POST'])
+# @auth.login_required
+def add_posts(user_id):
+    # Used for adding posts to the users feed
+    post_form = PostForm()
+    # get user id from authentication
+    if post_form.validate_on_submit():
+        caption = post_form.caption.data
+        photo = post_form.photo.data
+        user_id = post_form.user_id.data
+        
+        filename = secure_filename(photo.filename)
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        post = Post(caption=caption, photo=filename, user_id=user_id) 
+        db.session.add(post)
+        db.session.commit()
+        
+        post_data = {
+            "caption": post.caption,
+            "user_id": post.user_id
+        }
+        
+        return jsonify(message="Post added successfully", post=post_data), 201
+    else:
+        return jsonify(errors=form_errors(post_form)), 400
 
+@app.route('/api/v1/users/{user_id}/posts', methods=['GET'])
+# @auth.login_required
+def get_posts(user_id):
+    # Returns a user's posts
+    pass
 
+@app.route('/api/users/{user_id}/follow', methods=['POST'])
+# @auth.login_required
+def follow_user(user_id):
+    # Create a Follow relationship between the current user and the target user.
+    pass
+
+@app.route('/api/v1/posts', methods=['GET'])
+# @auth.login_required
+def get_all_posts():
+    # Return all posts for all users
+    pass
+    
+app.route('/api/v1/posts/{post_id}/like', methods=['POST'])
+# @auth.login_required
+def like_post(post_id):
+    # Set a like on the current Post by the logged in User
+    pass
 
 
 

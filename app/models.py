@@ -3,23 +3,20 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime
 
 class Post(db.Model):
-
-    __tablename__ = "Posts"
-
+    __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key=True)
     caption = db.Column(db.String(80))
     photo = db.Column(db.String(80))
-    user_id = db.Column(db.Integer)
-    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created_on = db.Column(db.DateTime, server_default=db.func.now())
 
-    def __init__(self, caption, user_id):
+    def __init__(self, caption, photo, user_id):
         self.caption = caption
         self.photo = photo
         self.user_id = user_id
 
 class User(db.Model):
-    __tablename__ = 'Users'
-
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(128))
@@ -29,9 +26,9 @@ class User(db.Model):
     location = db.Column(db.String(80))
     biography = db.Column(db.String(1000))
     profile_photo = db.Column(db.String(80))
-    joined_on = db.Column(db.DateTime, default=datetime.utcnow)
+    joined_on = db.Column(db.DateTime, server_default=db.func.now())
 
-    def __init__(self, username, password, firstname, lastname, email, location, biography):
+    def __init__(self, username, password, firstname, lastname, email, location, biography, profile_photo):
         self.username = username
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
         self.firstname = firstname
@@ -60,24 +57,20 @@ class User(db.Model):
         return '<User %r>' % (self.username)
 
 class Like(db.Model):
-
-    __tablename__ = "Likes"
-
+    __tablename__ = "likes"
     id = db.Column(db.Integer, primary_key=True)
-    post_id = db.Column(db.Integer)
-    user_id = db.Column(db.Integer)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __init__(self, post_id, user_id):
         self.post_id = post_id
         self.user_id = user_id
 
 class Follow(db.Model):
-
-    __tablename__ = "Follows"
-
+    __tablename__ = "follows"
     id = db.Column(db.Integer, primary_key=True)
-    follower_id = db.Column(db.Integer)
-    user_id = db.Column(db.Integer)
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __init__(self, follower_id, user_id):
         self.follower_id = follower_id
