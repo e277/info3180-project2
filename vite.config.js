@@ -12,10 +12,10 @@ export default defineConfig({
     }
   },
   server:{
-  proxy:{
+    proxy:{
       '^/api*':{
-          target:'http://localhost:8080/',
+        target:'http://localhost:8080/',
       },
+    },
   },
-  },
-  });
+});

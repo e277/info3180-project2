@@ -56,17 +56,6 @@ def requires_auth(f):
 
   return decorated
 
-@app.route('/token')
-def generate_token():
-    payload = {
-        'sub': '12345', # subject, usually a unique identifier
-        'name': 'John Doe',
-        'iat': datetime.datetime.now(datetime.timezone.utc), # issued at time
-        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=2) # expiration time
-    }
-    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-
-    return jsonify(error=None, data={'token': token}, message="Token Generated")
 
 @app.route('/')
 def index():
@@ -87,7 +76,6 @@ def register():
         profile_photo = form.profile_photo.data
         
         filename = secure_filename(profile_photo.filename)
-        # profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
         new_user = User(
@@ -119,12 +107,23 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user is not None and check_password_hash(user.password, password):
             login_user(user)
-            jwt_token = {"jwt_token": generate_token()}
+            # jwt_token = jwt.encode({"user_id": user.id, "exp": datetime.datetime.now() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm="HS256")
+            jwt_token = generate_token()
             return jsonify({"message": "User logged in successfully", "jwt_token": jwt_token}), 200
-            return jsonify({"message": "User logged in successfully"}), 200
         else:
             return jsonify({"message": "Invalid credentials"}), 400
     return jsonify({"errors": form.errors}), 400
+
+def generate_token():
+    payload = {
+        'sub': '12345', # subject, usually a unique identifier
+        'name': 'John Doe',
+        'iat': datetime.datetime.now(datetime.timezone.utc), # issued at time
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30) # expiration time
+    }
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+
+    return token
 
 @app.route("/api/v1/auth/logout", methods=['POST'])
 @login_required
