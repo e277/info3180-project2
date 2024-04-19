@@ -10,8 +10,8 @@ import { ref } from "vue";
                 <hr>
                 <p>Share photos of your favourite moments with friends, family and the world.</p>
                 <div class ="options">
-                    <button class="reg">Register</button>
-                    <button class="log">Login</button>
+                    <a href="/register" class="reg">Register</a>
+                    <a href="login" class="log">Login</a>
                 </div>
             </div>
     </div>

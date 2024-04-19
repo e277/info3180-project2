@@ -3,8 +3,6 @@ import HomeView from '../views/HomeView.vue'
 import RegisterUser from '@/components/RegisterUser.vue'
 import LoginUser from '@/components/LoginUser.vue'
 import LogoutUser from '@/components/LogoutUser.vue'
-import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
 import AddNewPostView from '@/views/AddNewPostView.vue';
 
 const router = createRouter({
@@ -37,7 +35,6 @@ const router = createRouter({
       path: '/logout',
       name: 'LogoutUser',
       component: LogoutUser
-    }
     },
     {
       path:'/post/create',
