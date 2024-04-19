@@ -16,7 +16,7 @@
               <RouterLink class="nav-link" to="/">MyProfile</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/">Logout</RouterLink>
+              <RouterLink class="nav-link" to="/logout">Logout</RouterLink>
             </li>
           </ul>
         </div>

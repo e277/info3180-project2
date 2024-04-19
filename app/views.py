@@ -14,6 +14,7 @@ from datetime import datetime
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
+from flask_wtf.csrf import generate_csrf
 
 
 ###
@@ -28,7 +29,7 @@ def index():
 @app.route('/api/v1/register', methods=['POST'])
 def register():
     form = UserForm()  
-    if form.validate():  
+    if form.validate_on_submit():  
         username = form.username.data
         password = form.password.data
         firstname = form.firstname.data
@@ -36,11 +37,11 @@ def register():
         email = form.email.data
         location = form.location.data
         biography = form.biography.data
-        profile_photo = form.profile_photo.data
+        # profile_photo = form.profile_photo.data
         profile_photo = form.profile_photo.data
         
         filename = secure_filename(profile_photo.filename)
-        profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        # profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
         new_user = User(
@@ -145,7 +146,6 @@ app.route('/api/v1/posts/{post_id}/like', methods=['POST'])
 def like_post(post_id):
     # Set a like on the current Post by the logged in User
     pass
-
 
 
 ###
