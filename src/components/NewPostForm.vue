@@ -1,16 +1,15 @@
 <template>
-    <h1>New Post</h1>
-    <form @submit.prevent = "saveMovie" id="movieForm" class = "movie-form">
+    <form @submit.prevent = "savePost" id="postForm" class = "post-form">
         <div class="form-group mb-3">
-            <label for="poster" class="form-label">Photo</label>
+            <label for="photo" class="form-label">Photo</label>
             <br>
             <input type="file" @change="onFileChange" id="poster" name="poster" class="form-control" accept="image/*"/>
         </div>
         <div class="form-group mb-3">
             <br>
-            <label for="description" class="form-label">Caption</label>
+            <label for="caption" class="form-label">Caption</label>
             <br>
-            <input v-model="mData.description" id="description" name="description" class="form-control2" placeholder="Write a caption..."/>
+            <input v-model="pData.caption" id="caption" name="caption" class="form-control2" placeholder="Write a caption..."/>
         </div>
             <br>
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -18,6 +17,42 @@
 </template>
 
 <script setup>
+
+import { ref, onMounted } from "vue";
+
+const pData = ref({
+    caption:'',
+    photo: null,
+});
+
+
+function savePost() {
+
+    let postForm = document.getElementById('postForm');
+    let form_data = new FormData(postForm);
+    let user_id = document.getElementById('user_id').value;
+
+    fetch("/api/v1/users/"+user_id+"/posts", {
+        method: 'POST',
+        body: form_data,
+    })
+    .then(function (response){
+        return response.json();
+    })
+    .then(function (data) { 
+        console.log(data);       
+    })
+    .catch(function (error){
+        console.log(error);
+    });
+};
+
+function onFileChange(event){
+    const file = event.target.files[0];
+    if (file){
+        pData.value.poster = file;
+    }
+}
 
 </script>
 
@@ -30,7 +65,7 @@ form{
         display: flex;
         flex-direction: column;
         width:500px;
-        height:350px;
+        height:auto;
         font-size:30px;
         border: 1px solid #BFBFBF;
         box-shadow: 10px 10px 5px #aaaaaa;
@@ -43,7 +78,7 @@ form{
     }
     
     .form-control2{
-        width:500px;
+        width:400px;
         height:70px;
         font-size:16px;
         border: 1px solid #ccc;
@@ -57,7 +92,7 @@ form{
     
     button{
         height:50px;
-        width:500px;
+        width:400px;
         font-size:20px;
         color:white;
         background-color:#7dbb13;
