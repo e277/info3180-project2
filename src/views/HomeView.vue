@@ -36,7 +36,7 @@ import { ref } from "vue";
         
   .information{
       width:500px;
-      height:300px;
+      height:360px;
       margin:20px;
       padding:30px;
       border: 1px solid #ccc;
@@ -54,6 +54,8 @@ import { ref } from "vue";
   .options{
       padding:20px;
       margin:20px;
+      display: flex;
+      justify-content: row;
   }
         
   button{
@@ -74,6 +76,7 @@ import { ref } from "vue";
   .log{
       background-color:#5013BB;
       border-radius: 5px;
+      margin:10px;
       color:white;
       font-size:20px;
       font-family: "Verdana", "Courier New", monospace;
