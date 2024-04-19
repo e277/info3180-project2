@@ -17,7 +17,7 @@ class FollowForm(FlaskForm):
     follower_id = IntegerField('FollowerID', validators=[InputRequired()])
     user_id = IntegerField('UserID', validators=[InputRequired()])
     
-class UserForm:
+class UserForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
     password = StringField('Password', validators=[InputRequired()])
     firstname = StringField('Firstname', validators=[InputRequired()])
@@ -26,3 +26,7 @@ class UserForm:
     location = StringField('Location', validators=[InputRequired()])
     biography = TextAreaField('Biography', validators=[InputRequired()])
     profile_photo = FileField('ProfilePhoto', validators=[FileRequired(), FileAllowed(['jpg', 'png'], 'Images only!')])
+    
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired()])
+    password = StringField('Password', validators=[InputRequired()])

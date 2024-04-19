@@ -9,16 +9,63 @@ from app import app, db, login_manager
 from flask import render_template, request, jsonify, send_file, url_for
 import os
 from app.models import User, Like, Follow, Post
-from app.forms import PostForm, LikeForm, FollowForm, UserForm
+from app.forms import PostForm, LikeForm, FollowForm, UserForm, LoginForm
 from datetime import datetime
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 
+import jwt
+from functools import wraps
+import datetime
+
+app.config['WTF_CSRF_ENABLED'] = False #Comment out
 
 ###
 # Routing for your application.
 ###
+def requires_auth(f):
+  @wraps(f)
+  def decorated(*args, **kwargs):
+    auth = request.headers.get('Authorization', None) # or request.cookies.get('token', None)
+
+    if not auth:
+      return jsonify({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'}), 401
+
+    parts = auth.split()
+
+    if parts[0].lower() != 'bearer':
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'}), 401
+    elif len(parts) == 1:
+      return jsonify({'code': 'invalid_header', 'description': 'Token not found'}), 401
+    elif len(parts) > 2:
+      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'}), 401
+
+    token = parts[1]
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'code': 'token_invalid_signature', 'description': 'Token signature is invalid'}), 401
+
+    g.current_user = user = payload
+    return f(*args, **kwargs)
+
+  return decorated
+
+@app.route('/token')
+def generate_token():
+    payload = {
+        'sub': '12345', # subject, usually a unique identifier
+        'name': 'John Doe',
+        'iat': datetime.datetime.now(datetime.timezone.utc), # issued at time
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=2) # expiration time
+    }
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+
+    return jsonify(error=None, data={'token': token}, message="Token Generated")
 
 @app.route('/')
 def index():
@@ -28,7 +75,7 @@ def index():
 @app.route('/api/v1/register', methods=['POST'])
 def register():
     form = UserForm()  
-    if form.validate():  
+    if form.validate_on_submit():  
         username = form.username.data
         password = form.password.data
         firstname = form.firstname.data
@@ -37,10 +84,8 @@ def register():
         location = form.location.data
         biography = form.biography.data
         profile_photo = form.profile_photo.data
-        profile_photo = form.profile_photo.data
         
         filename = secure_filename(profile_photo.filename)
-        profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
         new_user = User(
@@ -65,13 +110,15 @@ def register():
 
 @app.route('/api/v1/auth/login', methods=['POST'])
 def login():
-    form = UserForm()
+    form = LoginForm()
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
         user = User.query.filter_by(username=username).first()
         if user is not None and check_password_hash(user.password, password):
             login_user(user)
+            jwt_token = {"jwt_token": generate_token()}
+            return jsonify({"message": "User logged in successfully", "jwt_token": jwt_token}), 200
             return jsonify({"message": "User logged in successfully"}), 200
         else:
             return jsonify({"message": "Invalid credentials"}), 400
@@ -92,16 +139,16 @@ def logout():
 @login_manager.user_loader
 def load_user(id):
     return db.session.execute(db.select(User).filter_by(id=id)).scalar()
-    return db.session.execute(db.select(User).filter_by(id=id)).scalar()
-
 
 @app.route('/api/v1/users/<int:user_id>/posts', methods=['POST'])
-# @auth.login_required
+@requires_auth
 def add_posts(user_id):
     # Used for adding posts to the users feed
     post_form = PostForm()
     # get user id from authentication
     if post_form.validate_on_submit():
+        # get the csrf_token from the authorization header
+        
         caption = post_form.caption.data
         photo = post_form.photo.data
         user_id = post_form.user_id.data
@@ -122,25 +169,25 @@ def add_posts(user_id):
     else:
         return jsonify(errors=form_errors(post_form)), 400
 
-@app.route('/api/v1/users/{user_id}/posts', methods=['GET'])
-# @auth.login_required
+@app.route('/api/v1/users/<int:user_id>/posts', methods=['GET'])
+@requires_auth
 def get_posts(user_id):
     # Returns a user's posts
     pass
 
-@app.route('/api/users/{user_id}/follow', methods=['POST'])
-# @auth.login_required
+@app.route('/api/users/<int:user_id>/follow', methods=['POST'])
+@requires_auth
 def follow_user(user_id):
     # Create a Follow relationship between the current user and the target user.
     pass
 
 @app.route('/api/v1/posts', methods=['GET'])
-# @auth.login_required
+@requires_auth
 def get_all_posts():
     # Return all posts for all users
     pass
     
-app.route('/api/v1/posts/{post_id}/like', methods=['POST'])
+app.route('/api/v1/posts/<int:post_id>/like', methods=['POST'])
 # @auth.login_required
 def like_post(post_id):
     # Set a like on the current Post by the logged in User
