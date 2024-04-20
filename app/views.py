@@ -117,16 +117,14 @@ def login():
         username = form.username.data
         password = form.password.data
         user = User.query.filter_by(username=username).first()
-        print("USER: ", user)
+        
         if user is not None and check_password_hash(user.password, password):
             login_user(user)
             jwt_token = generate_token()
-            print("USER: ", user)
             data = {
                 "message": "User logged in successfully",
                 "jwt_token": jwt_token
             }
-            print("DATA:", data)
             return jsonify(data), 200
         else:
             return jsonify(errors=form_errors(form)), 400
@@ -206,7 +204,23 @@ def get_posts(user_id):
 @requires_auth
 def follow_user(user_id):
     # Create a Follow relationship between the current user and the target user.
-    pass
+    current_user_id = g.current_user['sub']
+    if current_user_id == user_id:
+        return jsonify({'error': 'You cannot follow yourself'}), 400
+
+    target_user = User.query.get(user_id)
+    if not target_user:
+        return jsonify({'error': 'User not found'}), 404
+
+    existing_follow = Follow.query.filter_by(follower_id=current_user_id, user_id=user_id).first()
+    if existing_follow:
+        return jsonify({'error': 'You are already following this user'}), 409
+
+    new_follow = Follow(follower_id=current_user_id, user_id=user_id)
+    db.session.add(new_follow)
+    db.session.commit()
+    
+    return jsonify({'message': 'You are now following {}'.format(target_user.username)}), 201
 
 @app.route('/api/v1/posts', methods=['GET'])
 @requires_auth
@@ -233,7 +247,7 @@ def get_all_posts():
         return jsonify(message="No posts found"), 200
     
 app.route('/api/v1/posts/<int:post_id>/like', methods=['POST'])
-# @auth.login_required
+@requires_auth
 def like_post(post_id):
     # Set a like on the current Post by the logged in User
     pass
@@ -244,11 +258,10 @@ def uploaded_photo(photo):
 
 def get_uploaded_photos():
     rootdir = os.getcwd()
-    # print(rootdir)
     image_list = []
+    
     for subdir, dirs, files in os.walk(os.path.join(rootdir, app.config['UPLOAD_FOLDER'])):
         for file in files:
-            # print(os.path.join(subdir, file))
             if file.endswith(('.jpg', '.png', '.jpeg')):
                 full_path = os.path.join(subdir, file)
                 relative_path = os.path.relpath(full_path, os.path.join(rootdir, app.config['UPLOAD_FOLDER']))
