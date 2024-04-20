@@ -6,7 +6,7 @@ This file creates your application.
 """
 
 from app import app, db, login_manager
-from flask import render_template, request, jsonify, send_file, url_for
+from flask import render_template, request, jsonify, send_file, url_for, g
 import os
 from app.models import User, Like, Follow, Post
 from app.forms import PostForm, LikeForm, FollowForm, UserForm, LoginForm
@@ -61,6 +61,21 @@ def requires_auth(f):
 def index():
     return jsonify(message="This is the beginning of our API")
 
+@app.route('/api/v1/csrf-token', methods=['GET'])
+def get_csrf():
+    return jsonify({'csrf_token': generate_csrf()}), 200
+
+@app.route('/api/v1/generate-token', methods=['GET'])
+def generate_token():
+    payload = {
+        'sub': current_user.id, # subject
+        'name': current_user.username, # username
+        'iat': datetime.datetime.now(datetime.timezone.utc), # issued at time
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30) # expiration time
+    }
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+
+    return token
 
 @app.route('/api/v1/register', methods=['POST'])
 def register():
@@ -94,8 +109,7 @@ def register():
         
         return jsonify({"message": "User registered successfully"}), 200
     else:
-        errors = form.errors 
-        return jsonify({"errors": errors}), 400
+        return jsonify(errors=form_errors(form)), 400
 
 
 @app.route('/api/v1/auth/login', methods=['POST'])
@@ -105,25 +119,21 @@ def login():
         username = form.username.data
         password = form.password.data
         user = User.query.filter_by(username=username).first()
+        print("USER: ", user)
         if user is not None and check_password_hash(user.password, password):
             login_user(user)
-            # jwt_token = jwt.encode({"user_id": user.id, "exp": datetime.datetime.now() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm="HS256")
             jwt_token = generate_token()
-            return jsonify({"message": "User logged in successfully", "jwt_token": jwt_token}), 200
+            print("USER: ", user)
+            data = {
+                "message": "User logged in successfully",
+                "jwt_token": jwt_token
+            }
+            print("DATA:", data)
+            return jsonify(data), 200
         else:
-            return jsonify({"message": "Invalid credentials"}), 400
-    return jsonify({"errors": form.errors}), 400
-
-def generate_token():
-    payload = {
-        'sub': '12345', # subject, usually a unique identifier
-        'name': 'John Doe',
-        'iat': datetime.datetime.now(datetime.timezone.utc), # issued at time
-        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30) # expiration time
-    }
-    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-
-    return token
+            return jsonify(errors=form_errors(form)), 400
+    else:
+        return jsonify(errors=form_errors(form)), 400
 
 @app.route("/api/v1/auth/logout", methods=['POST'])
 @login_required
@@ -174,7 +184,20 @@ def add_posts(user_id):
 @requires_auth
 def get_posts(user_id):
     # Returns a user's posts
-    pass
+    user_posts = Post.query.filter_by(user_id=user_id).all()
+    posts = []
+    if user_posts is not None and len(user_posts) > 0:
+        for post in user_posts:
+            posts.append({
+                "id": post.id,
+                "user_id": post.user_id,
+                "photo": post.photo,
+                "caption": post.caption,
+                "created_on": post.created_on
+            })
+        return jsonify(posts=posts), 200
+    else:
+        return jsonify(message="No posts found for user"), 200
 
 @app.route('/api/users/<int:user_id>/follow', methods=['POST'])
 @requires_auth
@@ -186,13 +209,28 @@ def follow_user(user_id):
 @requires_auth
 def get_all_posts():
     # Return all posts for all users
-    pass
+    posts = Post.query.all()
+    all_posts = []
+    if posts is not None and len(posts) > 0:
+        for post in posts:
+            all_posts.append({
+                "id": post.id,
+                "user_id": post.user_id,
+                "photo": post.photo,
+                "caption": post.caption,
+                "created_on": post.created_on
+            })
+        return jsonify(posts=all_posts), 200
+    else:
+        return jsonify(message="No posts found"), 200
     
 app.route('/api/v1/posts/<int:post_id>/like', methods=['POST'])
 # @auth.login_required
 def like_post(post_id):
     # Set a like on the current Post by the logged in User
     pass
+
+
 
 
 ###

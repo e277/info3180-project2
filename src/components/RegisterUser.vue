@@ -48,7 +48,7 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const username = ref('');
 const password = ref('');
@@ -59,12 +59,32 @@ const location = ref('');
 const biography = ref('');
 const profile_photo = ref(null);
 
+let csrf_token = ref("")
+
+onMounted(() => {
+  getCsrfToken();
+})
+
+function getCsrfToken() {
+    fetch('/api/v1/csrf-token')
+    .then((response) => {
+        return response.json();
+    })
+    .then((data) => {
+        console.log(data);
+        csrf_token.value = data.csrf_token;
+    })
+  };
+
 function registerUser() {
     let registerForm = document.getElementById('registerForm');
     let userData = new FormData(registerForm);
     
     fetch('/api/v1/register', {
         method: 'POST',
+        headers: {
+            'X-CSRFToken': csrf_token.value
+        },
         body: userData,
     })
     .then(response => response.json())

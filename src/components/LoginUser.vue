@@ -4,7 +4,7 @@
             <div class="card-body">
                 <p class="card-text">
                     <h3 class="text-center mb-4">Login</h3>
-                    <form @submit.prevent="login">
+                    <form @submit.prevent="login" id="loginForm">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
                             <input type="text" v-model="username" class="form-control border-login" id="username" required>
@@ -25,35 +25,57 @@
 
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
 
 const username = ref('');
 const password = ref('');
 
-const login = async () => {
-  try {
-    const response = await fetch('/api/v1/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value
-      })
-    });
-    const data = await response.json();
-    if (response.ok) {
-      alert(data.message);
-      router.push('/');
-    } else {
-      alert(data.message);
+let csrf_token = ref("")
+
+onMounted(() => {
+  getCsrfToken();
+})
+
+function getCsrfToken() {
+    fetch('/api/v1/csrf-token')
+    .then((response) => {
+        return response.json();
+    })
+    .then((data) => {
+        console.log(data);
+        csrf_token.value = data;
+    })
+  };
+
+function login() {
+  let loginForm = document.getElementById('loginForm');
+  let userData = new FormData(loginForm);
+
+  fetch('/api/v1/auth/login', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrf_token,
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    },
+    body: userData,
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-  } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login failed. Please try again later.');
-  }
+    return response.json();
+  })
+  .then(data => {
+    console.log(data);
+    localStorage.setItem('token', data.token);
+    alert(data.message);
+    router.push('/');
+  })
+  .catch(error => {
+    console.log(error);
+    alert(error.message);
+    router.push('/login');
+  });
 };
 </script>
 
