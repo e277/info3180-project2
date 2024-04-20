@@ -151,14 +151,14 @@ def load_user(id):
 @requires_auth
 def add_posts(user_id):
     # Used for adding posts to the users feed
-    post_form = PostForm()
+    form = PostForm()
     # get user id from authentication
-    if post_form.validate_on_submit():
+    if form.validate_on_submit():
         # get the csrf_token from the authorization header
         
-        caption = post_form.caption.data
-        photo = post_form.photo.data
-        user_id = post_form.user_id.data
+        caption = form.caption.data
+        photo = form.photo.data
+        user_id = form.user_id.data
         
         filename = secure_filename(photo.filename)
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -174,7 +174,7 @@ def add_posts(user_id):
         
         return jsonify(message="Post added successfully", post=post_data), 201
     else:
-        return jsonify(errors=form_errors(post_form)), 400
+        return jsonify(errors=form_errors(form)), 400
 
 @app.route('/api/v1/users/<int:user_id>/posts', methods=['GET'])
 @requires_auth
@@ -204,23 +204,30 @@ def get_posts(user_id):
 @requires_auth
 def follow_user(user_id):
     # Create a Follow relationship between the current user and the target user.
-    current_user_id = g.current_user['sub']
-    if current_user_id == user_id:
-        return jsonify({'error': 'You cannot follow yourself'}), 400
+    form = FollowForm(request.form, user_id=user_id)
+    if form.validate_on_submit():
+        current_user_id = g.current_user['sub']
+        if current_user_id == user_id:
+            return jsonify({'error': 'You cannot follow yourself'}), 400
 
-    target_user = User.query.get(user_id)
-    if not target_user:
-        return jsonify({'error': 'User not found'}), 404
+        if not form.user_id.data == user_id:
+            return jsonify({'error': 'User ID mismatch'}), 400
 
-    existing_follow = Follow.query.filter_by(follower_id=current_user_id, user_id=user_id).first()
-    if existing_follow:
-        return jsonify({'error': 'You are already following this user'}), 409
+        target_user = User.query.get(user_id)
+        if not target_user:
+            return jsonify({'error': 'User not found'}), 404
 
-    new_follow = Follow(follower_id=current_user_id, user_id=user_id)
-    db.session.add(new_follow)
-    db.session.commit()
-    
-    return jsonify({'message': 'You are now following {}'.format(target_user.username)}), 201
+        existing_follow = Follow.query.filter_by(follower_id=current_user_id, user_id=user_id).first()
+        if existing_follow:
+            return jsonify({'error': 'You are already following this user'}), 409
+
+        new_follow = Follow(follower_id=current_user_id, user_id=user_id)
+        db.session.add(new_follow)
+        db.session.commit()
+
+        return jsonify({'message': 'You are now following {}'.format(target_user.username)}), 201
+    else:
+        return jsonify(errors=form_errors(form)), 400
 
 @app.route('/api/v1/posts', methods=['GET'])
 @requires_auth
