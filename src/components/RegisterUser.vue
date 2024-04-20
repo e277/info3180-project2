@@ -7,31 +7,31 @@
                     <p class="card-text">
                         <div class="mb-3">
                             <label for="username" class="form-label bold">Username</label>
-                            <input type="text" class="form-control border1" id="username" v-model="username" required>
+                            <input type="text" class="form-control border1" name="username" v-model="username" required>
                         </div>    
                         <div class="mb-3">          
                             <label for="password" class="form-label bold">Password</label>
-                            <input type="password" id="password" class="form-control border1" aria-describedby="passwordHelpBlock" v-model="password" required>
+                            <input type="password" name="password" class="form-control border1" aria-describedby="passwordHelpBlock" v-model="password" required>
                         </div>  
                         <div class="mb-3">
                             <label for="firstname" class="form-label bold">First Name</label>
-                            <input type="text" class="form-control border1" id="firstname" v-model="firstname" required>
+                            <input type="text" class="form-control border1" name="firstname" v-model="firstname" required>
                         </div>
                         <div class="mb-3">
                             <label for="lastname" class="form-label bold">Last Name</label>
-                            <input type="text" class="form-control border1" id="lastname" v-model="lastname" required>
+                            <input type="text" class="form-control border1" name="lastname" v-model="lastname" required>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label bold">Email</label>
-                            <input type="email" class="form-control border1" id="email" placeholder="name@example.com" v-model="email" required>
+                            <input type="email" class="form-control border1" name="email" placeholder="name@example.com" v-model="email" required>
                         </div>
                         <div class="mb-3">
                             <label for="location" class="form-label bold">Location</label>
-                            <input type="text" class="form-control border1" id="location" v-model="location" required>
+                            <input type="text" class="form-control border1" name="location" v-model="location" required>
                         </div>
                         <div class="mb-3">
                             <label for="biography" class="form-label bold">Biography</label>
-                            <textarea class="form-control border1" id="biography" rows="3" v-model="biography"></textarea>
+                            <textarea class="form-control border1" name="biography" rows="3" v-model="biography"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="profile_photo" class="form-label bold">Photo</label>
@@ -82,10 +82,10 @@ function registerUser() {
     
     fetch('/api/v1/register', {
         method: 'POST',
+        body: userData,
         headers: {
             'X-CSRFToken': csrf_token.value
-        },
-        body: userData,
+        }        
     })
     .then(response => response.json())
     
