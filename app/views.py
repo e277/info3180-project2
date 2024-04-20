@@ -215,11 +215,11 @@ def follow_user(user_id):
 
         target_user = User.query.get(user_id)
         if not target_user:
-            return jsonify({'error': 'User not found'}), 404
+            return jsonify({'error': 'User not found'}), 400
 
         existing_follow = Follow.query.filter_by(follower_id=current_user_id, user_id=user_id).first()
         if existing_follow:
-            return jsonify({'error': 'You are already following this user'}), 409
+            return jsonify({'error': 'You are already following this user'}), 400
 
         new_follow = Follow(follower_id=current_user_id, user_id=user_id)
         db.session.add(new_follow)
@@ -253,11 +253,30 @@ def get_all_posts():
     else:
         return jsonify(message="No posts found"), 200
     
-app.route('/api/v1/posts/<int:post_id>/like', methods=['POST'])
+@app.route('/api/v1/posts/<int:post_id>/like', methods=['POST'])
 @requires_auth
 def like_post(post_id):
     # Set a like on the current Post by the logged in User
-    pass
+    form = LikeForm(request.form, post_id=post_id)
+    if form.validate_on_submit():
+        current_user_id = g.current_user['sub']
+        post_id = form.post_id.data
+
+        post = Post.query.get(post_id)
+        if not post:
+            return jsonify({'error': 'Post not found'}), 400
+
+        existing_like = Like.query.filter_by(post_id=post_id, user_id=current_user_id).first()
+        if existing_like:
+            return jsonify({'error': 'You have already liked this post'}), 400
+
+        new_like = Like(post_id=post_id, user_id=current_user_id)
+        db.session.add(new_like)
+        db.session.commit()
+
+        return jsonify({'message': 'You have liked the post'}), 201
+    else:
+        return jsonify(errors=form_errors(form)), 400
 
 @app.route('/uploads/<photo>')
 def uploaded_photo(photo):
