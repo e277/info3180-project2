@@ -6,7 +6,7 @@ This file creates your application.
 """
 
 from app import app, db, login_manager
-from flask import render_template, request, jsonify, send_file, url_for, g
+from flask import render_template, request, jsonify, send_file, url_for, g, send_from_directory
 import os
 from app.models import User, Like, Follow, Post
 from app.forms import PostForm, LikeForm, FollowForm, UserForm, LoginForm
@@ -55,7 +55,6 @@ def requires_auth(f):
     return f(*args, **kwargs)
 
   return decorated
-
 
 @app.route('/')
 def index():
@@ -110,7 +109,6 @@ def register():
         return jsonify({"message": "User registered successfully"}), 200
     else:
         return jsonify(errors=form_errors(form)), 400
-
 
 @app.route('/api/v1/auth/login', methods=['POST'])
 def login():
@@ -186,8 +184,13 @@ def get_posts(user_id):
     # Returns a user's posts
     user_posts = Post.query.filter_by(user_id=user_id).all()
     posts = []
+    photos = get_uploaded_photos()
+    
     if user_posts is not None and len(user_posts) > 0:
         for post in user_posts:
+            if post.photo in photos:
+                post.photo = url_for('uploaded_photo', photo=post.photo)
+            
             posts.append({
                 "id": post.id,
                 "user_id": post.user_id,
@@ -211,8 +214,13 @@ def get_all_posts():
     # Return all posts for all users
     posts = Post.query.all()
     all_posts = []
+    photos = get_uploaded_photos()
+    
     if posts is not None and len(posts) > 0:
         for post in posts:
+            if post.photo in photos:
+                post.photo = url_for('uploaded_photo', photo=post.photo)
+                        
             all_posts.append({
                 "id": post.id,
                 "user_id": post.user_id,
@@ -230,7 +238,22 @@ def like_post(post_id):
     # Set a like on the current Post by the logged in User
     pass
 
+@app.route('/uploads/<photo>')
+def uploaded_photo(photo):
+    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER']), photo)
 
+def get_uploaded_photos():
+    rootdir = os.getcwd()
+    # print(rootdir)
+    image_list = []
+    for subdir, dirs, files in os.walk(os.path.join(rootdir, app.config['UPLOAD_FOLDER'])):
+        for file in files:
+            # print(os.path.join(subdir, file))
+            if file.endswith(('.jpg', '.png', '.jpeg')):
+                full_path = os.path.join(subdir, file)
+                relative_path = os.path.relpath(full_path, os.path.join(rootdir, app.config['UPLOAD_FOLDER']))
+                image_list.append(relative_path)
+    return image_list
 
 
 ###
