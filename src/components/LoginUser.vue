@@ -7,11 +7,11 @@
                     <form @submit.prevent="login" id="loginForm">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" v-model="username" class="form-control border-login" id="username" required>
+                            <input type="text" v-model="username" class="form-control border-login" name="username" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" v-model="password" class="form-control border-login" id="password" required>
+                            <input type="password" v-model="password" class="form-control border-login" name="password" required>
                         </div>
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary">Login</button>
@@ -26,6 +26,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import router from '../router/index.js'; 
 
 const username = ref('');
 const password = ref('');
@@ -61,7 +62,8 @@ function login() {
   })
   .then(response => {
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+        console.log(response.errors);
+      //throw new Error('Network response was not ok');
     }
     return response.json();
   })

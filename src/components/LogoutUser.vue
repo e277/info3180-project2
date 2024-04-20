@@ -74,8 +74,4 @@ h3 {
     font-family: 'Times New Roman', Times, serif;
 }
 
-.btn-logout {
-    background-color: #7dbb13;
-}
-
 </style>
