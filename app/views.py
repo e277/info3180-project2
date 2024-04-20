@@ -92,21 +92,24 @@ def register():
         filename = secure_filename(profile_photo.filename)
         profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
-        new_user = User(
-            username = username,
-            password = password,
-            firstname = firstname,
-            lastname = lastname,
-            email = email,
-            location = location,
-            biography = biography,
-            profile_photo = filename
-        )
-        
-        db.session.add(new_user)
-        db.session.commit() 
-        
-        return jsonify({"message": "User registered successfully"}), 200
+        user = User.query.filter_by(username=username).first()
+        if user is None:
+            new_user = User(
+                username = username,
+                password = password,
+                firstname = firstname,
+                lastname = lastname,
+                email = email,
+                location = location,
+                biography = biography,
+                profile_photo = filename
+            )
+            
+            db.session.add(new_user)
+            db.session.commit() 
+            return jsonify({"message": "User registered successfully"}), 200
+        else:
+            return jsonify(errors="Username already exists"), 400
     else:
         return jsonify(errors=form_errors(form)), 400
 
@@ -127,7 +130,7 @@ def login():
             }
             return jsonify(data), 200
         else:
-            return jsonify(errors=form_errors(form)), 400
+            return jsonify(errors="Invalid username or password"), 400
     else:
         return jsonify(errors=form_errors(form)), 400
 
