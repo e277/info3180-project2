@@ -30,8 +30,7 @@ import router from '../router/index.js';
 
 const username = ref('');
 const password = ref('');
-
-let csrf_token = ref("")
+const csrf_token = ref("")
 
 onMounted(() => {
   getCsrfToken();
@@ -43,42 +42,42 @@ function getCsrfToken() {
         return response.json();
     })
     .then((data) => {
-        console.log(data);
-        csrf_token.value = data;
+        // console.log(data);
+        csrf_token.value = data.csrf_token;
     })
   };
 
 function login() {
-  let loginForm = document.getElementById('loginForm');
-  let userData = new FormData(loginForm);
+    const loginData = {
+        username: username.value,
+        password: password.value
+    };
 
-  fetch('/api/v1/auth/login', {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': csrf_token,
-      'Authorization': 'Bearer ' + localStorage.getItem('token')
-    },
-    body: userData,
-  })
-  .then(response => {
-    if (!response.ok) {
-        console.log(response.errors);
-      //throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log(data);
-    localStorage.setItem('token', data.token);
-    alert(data.message);
-    router.push('/');
-  })
-  .catch(error => {
-    console.log(error);
-    alert(error.message);
-    router.push('/login');
-  });
+    fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrf_token.value
+        },
+        body: JSON.stringify(loginData),
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        localStorage.setItem('jwt_token', data.jwt_token);
+        localStorage.setItem('user_id', data.user_id);
+        alert('Login Successful!');
+        router.push('/explore');
+    })
+    .catch(error => {
+        console.log("[Login Error]: ", error);
+        alert(error.message);
+        router.push('/login');
+    });
 };
+
 </script>
 
 <style scoped>
