@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 
 const pData = ref({
     caption:'',
@@ -28,7 +28,7 @@ function savePost() {
 
     let postForm = document.getElementById('postForm');
     let form_data = new FormData(postForm);
-    let user_id = current_user.user_id;
+    let user_id = localStorage.getItem('id');
 
     fetch("/api/v1/users/"+user_id+"/posts", {
         method: 'POST',
