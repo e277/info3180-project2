@@ -17,43 +17,22 @@
 </template>
 
 <script setup>
-
 import { ref, onMounted } from "vue";
 
 const pData = ref({
     caption:'',
     photo: null,
 });
-let csrf_token = ref("")
-
-onMounted(() => {
-  getCsrfToken();
-})
-
-function getCsrfToken() {
-    fetch('/api/v1/csrf-token')
-    .then((response) => {
-        return response.json();
-    })
-    .then((data) => {
-        console.log(data);
-        csrf_token.value = data.csrf_token;
-    })
-  };
-
 
 function savePost() {
 
     let postForm = document.getElementById('postForm');
     let form_data = new FormData(postForm);
-    let user_id = document.getElementById('user_id').value;
+    let user_id = current_user.user_id;
 
     fetch("/api/v1/users/"+user_id+"/posts", {
         method: 'POST',
         body: form_data,
-        headers: {
-            'X-CSRFToken': csrf_token.value
-        }
     })
     .then(function (response){
         return response.json();
