@@ -15,7 +15,7 @@
             <li class="nav-item">
               <RouterLink class="nav-link active" to="/">MyProfile</RouterLink>
             </li>
-            <li class="nav-item" v-if="loggedin">
+            <li class="nav-item">
               <RouterLink class="nav-link active" to="/logout">Logout</RouterLink>
             </li>
           </ul>
@@ -26,21 +26,6 @@
 </template>
 
 <script setup>
-import { ref,reactive } from "vue";
-
-const loggedin = true;
-
-const loginState = reactive({
-  loggedin :false
-});
-
-function checkstatus(){
-  const auth = localStorage.getItem('token');
-  loginState.loggedin = auth != null;
-}
-
-checkstatus();
-
 
 </script>
 
