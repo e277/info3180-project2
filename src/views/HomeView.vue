@@ -11,7 +11,7 @@ import { ref } from "vue";
                 <p>Share photos of your favourite moments with friends, family and the world.</p>
                 <div class ="options">
                     <a href="/register" class="reg">Register</a>
-                    <a href="login" class="log">Login</a>
+                    <a href="/login" class="log">Login</a>
                 </div>
             </div>
     </div>
@@ -58,9 +58,10 @@ import { ref } from "vue";
       justify-content: row;
   }
         
-  button{
-      width:190px;
-      height:40px;
+  a{
+    width:190px;
+    height:40px;
+    text-align:center;
   }
         
   .reg{
@@ -71,6 +72,7 @@ import { ref } from "vue";
       font-size:20px;
       font-family: "Verdana", "Courier New", monospace;
       border: 1px solid #7dbb13;
+      text-decoration:none;
   }
         
   .log{
@@ -81,6 +83,7 @@ import { ref } from "vue";
       font-size:20px;
       font-family: "Verdana", "Courier New", monospace;
       border: 1px solid #5013BB;
+      text-decoration:none;
   }
         
   p{
