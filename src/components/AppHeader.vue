@@ -5,18 +5,18 @@
         <a class="navbar-brand" href="/"></a>
         <span class="navbar-brand"><img src="../assets/cam.png" alt="Photogram Logo" width="30" height="30" class="d-inline-block align-top">Photogram</span>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav ml-auto">
+          <ul class="navbar-nav">
             <li class="nav-item">
               <RouterLink to="/" class="nav-link active">Home</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/">Explore</RouterLink>
+              <RouterLink class="nav-link active" to="/">Explore</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/">MyProfile</RouterLink>
+              <RouterLink class="nav-link active" to="/">MyProfile</RouterLink>
             </li>
-            <li class="nav-item">
-              <RouterLink class="nav-link" to="/logout">Logout</RouterLink>
+            <li class="nav-item" v-if="loggedin">
+              <RouterLink class="nav-link active" to="/logout">Logout</RouterLink>
             </li>
           </ul>
         </div>
@@ -26,7 +26,22 @@
 </template>
 
 <script setup>
-import { RouterLink } from "vue-router";
+import { ref,reactive } from "vue";
+
+const loggedin = true;
+
+const loginState = reactive({
+  loggedin :false
+});
+
+function checkstatus(){
+  const auth = localStorage.getItem('token');
+  loginState.loggedin = auth != null;
+}
+
+checkstatus();
+
+
 </script>
 
 <style>
@@ -60,17 +75,15 @@ import { RouterLink } from "vue-router";
         display: flex;
         flex-direction: row;
         list-style-type: none;
-        padding-left: 650px;
+        padding-left: 400px;
     }
-    .nav-item {
-        padding-right: 30px;
-    }
- 
+
     .navbar-brand,
     .navbar-text,
     .navbar-toggler {
         display: inline-flex;
         align-items: center;
-        margin-right: 10px;
+        margin-right:1px;
+
     }
 </style>
