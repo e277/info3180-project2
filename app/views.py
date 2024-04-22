@@ -67,14 +67,13 @@ def get_csrf():
 @app.route('/api/v1/generate-token', methods=['GET'])
 def generate_token():
     payload = {
-        'sub': current_user.id, # subject
-        'name': current_user.username, # username
-        'iat': datetime.datetime.now(datetime.timezone.utc), # issued at time
-        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30) # expiration time
+        'sub': current_user.id,  # subject
+        'name': current_user.username,  # username
+        'iat': datetime.datetime.now(datetime.timezone.utc),  # issued at time
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)  # expiration time
     }
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-
-    return token
+    return {'jwt_token': token, 'user_id': current_user.id}
 
 @app.route('/api/v1/register', methods=['POST'])
 def register():
@@ -120,19 +119,19 @@ def login():
         username = form.username.data
         password = form.password.data
         user = User.query.filter_by(username=username).first()
-        
+
         if user is not None and check_password_hash(user.password, password):
             login_user(user)
-            jwt_token = generate_token()
-            data = {
+            token_info = generate_token()
+            return jsonify({
                 "message": "User logged in successfully",
-                "jwt_token": jwt_token
-            }
-            return jsonify(data), 200
+                "jwt_token": token_info['jwt_token'],
+                "user_id": token_info['user_id']
+            }), 200
         else:
-            return jsonify(errors="Invalid username or password"), 400
+            return jsonify({"errors": "Invalid username or password"}), 400
     else:
-        return jsonify(errors=form_errors(form)), 400
+        return jsonify({"errors": form_errors(form)}), 400
 
 @app.route("/api/v1/auth/logout", methods=['POST'])
 @login_required
