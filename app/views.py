@@ -335,8 +335,9 @@ def add_header(response):
     response.headers['Cache-Control'] = 'public, max-age=0'
     return response
 
+#TODO: uncomment
 
-@app.errorhandler(404)
-def page_not_found(error):
-    """Custom 404 page."""
-    return render_template('404.html'), 404
+# @app.errorhandler(404)
+# def page_not_found(error):
+#     """Custom 404 page."""
+#     return render_template('404.html'), 404
