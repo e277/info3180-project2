@@ -232,7 +232,7 @@ def follow_user(user_id):
         return jsonify(errors=form_errors(form)), 400
 
 @app.route('/api/v1/posts', methods=['GET'])
-@requires_auth
+# @requires_auth TODO: uncomment
 def get_all_posts():
     # Return all posts for all users
     posts = Post.query.all()
@@ -243,12 +243,25 @@ def get_all_posts():
         for post in posts:
             if post.photo in photos:
                 post.photo = url_for('uploaded_photo', photo=post.photo)
+
+            #get username and user profile photo based on user id
+            user_data = db.session.query(User.profile_photo, User.username) \
+                        .join(Post, Post.user_id == User.id) \
+                        .filter(Post.id == post.id) \
+                        .first()
+            
+            profile_photo, username = user_data
+
+            #get likes 
+            likes = 1
                         
             all_posts.append({
                 "id": post.id,
-                "user_id": post.user_id,
-                "photo": post.photo,
+                "profile_pic": "/uploads/" + profile_photo,
+                "username": username,
+                "photo": post.photo, #didn't do the route here because you got it before
                 "caption": post.caption,
+                "likes": likes,
                 "created_on": post.created_on
             })
         return jsonify(posts=all_posts), 200

@@ -86,7 +86,7 @@ import { ref } from "vue";
       text-decoration:none;
   }
         
-  p{
+  .information > p{
       font-size:18px;
       font-family: "Verdana", "Courier New", monospace;
   }

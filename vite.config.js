@@ -14,7 +14,8 @@ export default defineConfig({
   server:{
     proxy:{
       '^/api*':{
-        target:'http://localhost:8080/',
+        //TODO: change back to localhost
+        target:'http://127.0.0.1:8080/',
       },
     },
   },
