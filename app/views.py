@@ -191,12 +191,15 @@ def get_posts(user_id):
             if post.photo in photos:
                 post.photo = url_for('uploaded_photo', photo=post.photo)
             
+            posts_count = Post.query.filter_by(user_id=user_id).count()
+            
             posts.append({
                 "id": post.id,
                 "user_id": post.user_id,
                 "photo": post.photo,
                 "caption": post.caption,
-                "created_on": post.created_on
+                "created_on": post.created_on,
+                "total_posts": posts_count
             })
         return jsonify(posts=posts), 200
     else:
@@ -205,31 +208,30 @@ def get_posts(user_id):
 @app.route('/api/users/<int:user_id>/follow', methods=['POST'])
 @requires_auth
 def follow_user(user_id):
-    # Create a Follow relationship between the current user and the target user.
-    form = FollowForm(request.form, user_id=user_id)
-    if form.validate_on_submit():
-        current_user_id = g.current_user['sub']
-        if current_user_id == user_id:
-            return jsonify({'error': 'You cannot follow yourself'}), 400
+    current_user_id = g.current_user['sub']
+    if current_user_id == user_id:
+        return jsonify({'error': 'You cannot follow yourself'}), 400
 
-        if not form.user_id.data == user_id:
-            return jsonify({'error': 'User ID mismatch'}), 400
+    target_user = User.query.get(user_id)
+    if not target_user:
+        return jsonify({'error': 'User not found'}), 404
 
-        target_user = User.query.get(user_id)
-        if not target_user:
-            return jsonify({'error': 'User not found'}), 400
+    existing_follow = Follow.query.filter_by(follower_id=current_user_id, user_id=user_id).first()
+    if existing_follow:
+        return jsonify({'error': 'You are already following this user', 'following': True}), 200
 
-        existing_follow = Follow.query.filter_by(follower_id=current_user_id, user_id=user_id).first()
-        if existing_follow:
-            return jsonify({'error': 'You are already following this user'}), 400
+    new_follow = Follow(follower_id=current_user_id, user_id=user_id)
+    db.session.add(new_follow)
+    db.session.commit()
 
-        new_follow = Follow(follower_id=current_user_id, user_id=user_id)
-        db.session.add(new_follow)
-        db.session.commit()
+    # Assuming a followers relationship defined through Follow model or similar approach
+    follower_count = Follow.query.filter_by(user_id=user_id).count()
 
-        return jsonify({'message': 'You are now following {}'.format(target_user.username)}), 201
-    else:
-        return jsonify(errors=form_errors(form)), 400
+    return jsonify({
+        'message': 'You are now following {}'.format(target_user.username),
+        'following': True,
+        'follower_count': follower_count  # Update follower count dynamically
+    }), 201
 
 @app.route('/api/v1/posts', methods=['GET'])
 # @requires_auth TODO: uncomment
@@ -292,13 +294,19 @@ def like_post(post_id):
 
         existing_like = Like.query.filter_by(post_id=post_id, user_id=current_user_id).first()
         if existing_like:
-            return jsonify({'error': 'You have already liked this post'}), 400
+            return jsonify({'error': 'You have already liked this post', 'liked': True}), 200
 
         new_like = Like(post_id=post_id, user_id=current_user_id)
         db.session.add(new_like)
         db.session.commit()
 
-        return jsonify({'message': 'You have liked the post'}), 201
+        like_count = Like.query.filter_by(post_id=post_id).count()  # Assuming a simple count method for likes
+
+        return jsonify({
+            'message': 'You have liked the post',
+            'liked': True,
+            'like_count': like_count  # Update like count dynamically
+        }), 201
     else:
         return jsonify(errors=form_errors(form)), 400
 
