@@ -2,8 +2,9 @@
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/"></a>
-        <span class="navbar-brand"><img src="../assets/cam.png" alt="Photogram Logo" width="30" height="30" class="d-inline-block align-top">Photogram</span>
+        <a class="navbar-brand" href="/">
+          <span class="navbar-brand"><img src="../assets/cam.png" alt="Photogram Logo" width="30" height="30" class="d-inline-block align-top">Photogram</span>
+        </a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav">
             <li class="nav-item">
@@ -33,6 +34,11 @@
     .container-fluid{
         display:flex;
         flex-direction:row;
+    }
+
+    .container-fluid a{
+      width:190px;
+      text-align:center;
     }
     
     img {

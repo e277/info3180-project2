@@ -5,6 +5,7 @@ import { Heart } from 'lucide-vue-next';
 
 defineProps([
   "profilePic",
+  "userId",
   "username",
   "photo",
   "caption",
@@ -22,11 +23,15 @@ defineProps([
       <div class="feedPost">
 
           <div class="post_header">
-            <div class="thumbnail">
-              <img :src="profilePic" :alt="`Profile picture for ${username}`"/>
-            </div>
+            <a class="profileLink" :href="'/profile/' + userId"> 
+              <div class="thumbnail">
+                <img :src="profilePic" :alt="`Profile picture for ${username}`"/>
+              </div>
             
-            <p>{{username}}</p>
+            
+              <p>{{username}}</p>
+
+            </a>
           </div>
 
       </div>
@@ -101,20 +106,14 @@ defineProps([
   margin-right: 4px;
 }
 
-.post_header{
-  display: flex;
-  gap: 1rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  align-items: center;
-}
-  
+
 .thumbnail {
   width: 50px;
   height: 50px;
   overflow: hidden;
   border-radius: 9999px;
+  font-size: 0.6rem;
+
 }
 
 .thumbnail img{
@@ -137,6 +136,23 @@ defineProps([
   object-fit: cover;
   display: block;
 
+}
+
+.profileLink{
+
+  all: unset;
+  display: flex;
+  max-width: fit-content;
+  gap: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  align-items: center;
+  cursor: pointer;
+}
+
+.profileLink:hover{
+  color: rgb(32, 168, 173);
 }
 
 

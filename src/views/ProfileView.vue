@@ -58,11 +58,7 @@ import { ref } from "vue";
       justify-content: row;
   }
         
-  .options > a{
-    width:190px;
-    height:40px;
-    text-align:center;
-  }
+
         
   .reg{
       background-color:#7dbb13;

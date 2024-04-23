@@ -267,6 +267,7 @@ def get_all_posts():
             all_posts.append({
                 "id": post.id,
                 "profile_pic": "/uploads/" + profile_photo,
+                "user_id": post.user_id,
                 "username": username,
                 "photo": post.photo, #didn't do the route here because you got it before
                 "caption": post.caption,

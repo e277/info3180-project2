@@ -31,7 +31,8 @@ function fetchPosts() {
     <div class="pageWrapper">
         
         <div class="ctn">
-            <FeedPost v-for="post in allPosts" :key="post.username"
+            <FeedPost v-for="post in allPosts" :key="post.user_id"
+                :userId="post.user_id"
                 :profilePic="post.profile_pic"
                 :username="post.username"
                 :photo="post.photo" 

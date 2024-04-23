@@ -5,6 +5,7 @@ import LoginUser from '../components/LoginUser.vue'
 import LogoutUser from '../components/LogoutUser.vue'
 import AddNewPostView from '../views/AddNewPostView.vue';
 import ExploreView from '../views/ExploreView.vue';
+import ProfileView from '../views/ProfileView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,11 @@ const router = createRouter({
       path:'/explore',
       name: 'ExploreView',
       component: ExploreView,
+    },
+    {
+      path:'/profile/:user_id',
+      name: 'ProfileView',
+      component: ProfileView,
     },
   ]
 })
