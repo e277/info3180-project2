@@ -208,6 +208,7 @@ def get_posts(user_id):
 @app.route('/api/users/<int:user_id>/follow', methods=['POST'])
 @requires_auth
 def follow_user(user_id):
+    # Create a Follow relationship between the current user and the target user.
     current_user_id = g.current_user['sub']
     if current_user_id == user_id:
         return jsonify({'error': 'You cannot follow yourself'}), 400
@@ -261,32 +262,27 @@ def get_all_posts():
 @requires_auth
 def like_post(post_id):
     # Set a like on the current Post by the logged in User
-    form = LikeForm(request.form, post_id=post_id)
-    if form.validate_on_submit():
-        current_user_id = g.current_user['sub']
-        post_id = form.post_id.data
+    current_user_id = g.current_user['sub']
+    
+    target_post = Post.query.get(post_id)
+    if not target_post:
+        return jsonify({'error': 'Post not found'}), 400
 
-        post = Post.query.get(post_id)
-        if not post:
-            return jsonify({'error': 'Post not found'}), 400
+    existing_like = Like.query.filter_by(post_id=post_id, user_id=current_user_id).first()
+    if existing_like:
+        return jsonify({'error': 'You have already liked this post', 'liked': True}), 200
 
-        existing_like = Like.query.filter_by(post_id=post_id, user_id=current_user_id).first()
-        if existing_like:
-            return jsonify({'error': 'You have already liked this post', 'liked': True}), 200
+    new_like = Like(post_id=post_id, user_id=current_user_id)
+    db.session.add(new_like)
+    db.session.commit()
 
-        new_like = Like(post_id=post_id, user_id=current_user_id)
-        db.session.add(new_like)
-        db.session.commit()
+    like_count = Like.query.filter_by(post_id=post_id).count()  # Assuming a simple count method for likes
 
-        like_count = Like.query.filter_by(post_id=post_id).count()  # Assuming a simple count method for likes
-
-        return jsonify({
-            'message': 'You have liked the post',
-            'liked': True,
-            'like_count': like_count  # Update like count dynamically
-        }), 201
-    else:
-        return jsonify(errors=form_errors(form)), 400
+    return jsonify({
+        'message': 'You have liked the post',
+        'liked': True,
+        'like_count': like_count  # Update like count dynamically
+    }), 201
 
 @app.route('/uploads/<photo>')
 def uploaded_photo(photo):
