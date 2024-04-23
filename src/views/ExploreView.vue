@@ -38,6 +38,7 @@ function fetchPosts() {
                 :caption="post.caption"
                 :date="post.created_on"
                 :likes="post.likes"
+                :isLiked="post.isLiked"
             />
         </div>
     </div>

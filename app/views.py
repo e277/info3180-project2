@@ -253,7 +253,14 @@ def get_all_posts():
             profile_photo, username = user_data
 
             #get likes 
-            likes = 1
+            likes = Like.query.filter_by(post_id=post.id).count()
+
+
+            #did the current user like this?
+            #TODO: fake user id
+            fake_current_user = 1
+            is_liked = Like.query.filter_by(post_id=post.id, user_id=fake_current_user).first()
+            isLiked = bool(is_liked)
                         
             all_posts.append({
                 "id": post.id,
@@ -262,7 +269,9 @@ def get_all_posts():
                 "photo": post.photo, #didn't do the route here because you got it before
                 "caption": post.caption,
                 "likes": likes,
+                "isLiked": isLiked,
                 "created_on": post.created_on
+
             })
         return jsonify(posts=all_posts), 200
     else:

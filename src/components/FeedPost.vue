@@ -10,7 +10,8 @@ defineProps([
   "caption",
   "date",
   "likes",
-  "current"
+  "isLiked"
+  
 ]);
 
 </script>
@@ -35,15 +36,17 @@ defineProps([
         </div>
 
       <div class="feedPost">
-          <p class="caption">{{caption}}</p>
+          <p class="caption">{{caption}} Creating memories by the seaside. Waves of laughter. Enjoying the tranquility of the ocean breeze and the warmth of the sun.</p>
           
           <div class="post_footer">
             
 
             <div class="like_ctn">
-              <Heart class="like_icon"/>
+              <Heart v-if="isLiked == false" color="#747474" class="like_icon"/>
+              <Heart v-else color="#ee3543" fill="#ee3543" class="like_icon"/>
               
-              <p> {{likes}} Likes</p>
+              
+              <p> {{likes}} {{ likes === 1 ? 'Like' : 'Likes' }}</p>
             </div>
 
             <p>{{date}}</p>
@@ -61,7 +64,7 @@ defineProps([
   border-radius: 5px;
   border: 1px solid rgb(215, 215, 215);
   width: 100%;
-  max-width: 700px;
+  max-width: 600px;
   word-wrap: break-word;
   margin-bottom: 4rem;
 
@@ -96,7 +99,6 @@ defineProps([
 .like_icon{
   align-self: flex-start;
   margin-right: 4px;
-  color: #747474;
 }
 
 .post_header{
@@ -109,8 +111,8 @@ defineProps([
 }
   
 .thumbnail {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   overflow: hidden;
   border-radius: 9999px;
 }
@@ -122,7 +124,6 @@ defineProps([
   display: block;
 
 }
-
 
 .post_photo {
   width: 100%;
