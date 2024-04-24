@@ -1,9 +1,9 @@
 <script setup>
 
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Users, MapPin } from 'lucide-vue-next';
 
-defineProps([
+const props = defineProps([
   
   "firstname",
   "lastname",
@@ -16,10 +16,15 @@ defineProps([
   "isFollowing"
 ]);
 
+let date = computed(() => {
 
-// let dateObj = new Date(joinedOn);
-// const month = dateObj.toLocaleString('default', { month: 'long' });
-// const year = dateObj.getFullYear();
+  let dateObj = new Date(props.joinedOn);
+  const month = dateObj.toLocaleString('default', { month: 'long' });
+  const year = dateObj.getFullYear();
+
+  return [month, year]
+})
+
 
 </script>
 
@@ -44,8 +49,8 @@ defineProps([
 
         <p>{{bio}}</p>
 
-        <p class="joined">Member since</p>
-        <!-- <p>Member since {{ month }} {{ year }}</p> -->
+        <!-- <p class="joined">Member since</p> -->
+        <p>Member since {{date[0]}} {{date[1]}}</p>
 
 
 
