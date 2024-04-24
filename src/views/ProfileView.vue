@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import {useRoute} from "vue-router";
 import UserProfileHeader from "../components/UserProfileHeader.vue";
+import UserProfilePosts from "../components/UserProfilePosts.vue";
 
 let profile = ref([]);
 let posts = ref([])
@@ -50,9 +51,20 @@ function fetchProfile() {
                 :bio="profile.bio"
                 :followersCount="profile.followers_count"
                 :totalPosts="profile.total_posts"
-            
+                :isFollowing="isFollowing"
             
             />
+
+            <div class="postGrid">
+
+                <UserProfilePosts v-for="post in posts" :key="post.id"
+
+                    :id="post.id"
+                    :photo="post.photo"
+                
+                />
+
+            </div>
         </div>
     </div>
 </template>
@@ -62,6 +74,12 @@ function fetchProfile() {
 .profileCtn{
     width: 100%;
     max-width: 1300px;
+}
+
+.postGrid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    grid-gap: 7px; 
 }
 
 </style>

@@ -185,6 +185,7 @@ def get_posts(user_id):
     user_posts = Post.query.filter_by(user_id=user_id).all()
     posts = []
     photos = get_uploaded_photos()
+
     
     if user_posts is not None and len(user_posts) > 0:
         for post in user_posts:
@@ -213,18 +214,24 @@ def get_posts(user_id):
         posts_count = Post.query.filter_by(user_id=user_id).count()
         user = User.query.get(user_id)
 
+        #is following
+        #TODO: fake user id
+        fake_current_user_id = 1
+        count = Follow.query.filter_by(follower_id=fake_current_user_id, user_id=user.user_id).first()
+        isFollowing = count > 0
+
         user_info = {
             "firstname": user.firstname,
             "lastname": user.lastname,
             "location": user.location,
             "joined_on": user.joined_on,
             "bio": user.biography,
-            "profile_photo": user.profile_photo,
+            "profile_photo": url_for('uploaded_photo', photo=user.profile_photo),
             "followers_count": followers_count,
-            "total_posts": posts_count
+            "total_posts": posts_count,
+            "isFollowing": isFollowing
         }
 
-        
         return jsonify(posts=posts, user_info=user_info), 200
     else:
         return jsonify(message="No posts found for user"), 200
@@ -291,7 +298,7 @@ def get_all_posts():
                         
             all_posts.append({
                 "id": post.id,
-                "profile_pic": "/uploads/" + profile_photo,
+                "profile_pic": url_for('uploaded_photo', photo=profile_photo),
                 "user_id": post.user_id,
                 "username": username,
                 "photo": post.photo, #didn't do the route here because you got it before

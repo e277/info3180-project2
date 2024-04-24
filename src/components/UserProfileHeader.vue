@@ -4,9 +4,7 @@ import { ref } from "vue";
 import { Users, MapPin } from 'lucide-vue-next';
 
 defineProps([
-  "id",
-  "user_id",
-  "photo",
+  
   "firstname",
   "lastname",
   "location",
@@ -14,7 +12,8 @@ defineProps([
   "profilePic",
   "bio",
   "totalPosts",
-  "followersCount" 
+  "followersCount",
+  "isFollowing"
 ]);
 
 
@@ -28,21 +27,29 @@ defineProps([
 <template>
   <div class="userProfileCtn">
 
-    <div class="info">
 
-      <h2>{{firstname}} {{lastname}}</h2>
-
-      <div class="location"> 
-        <MapPin/> 
-        {{location}}
+    <div class="picAndInfo">
+      <div class="thumbnail">
+        <img :src="profilePic" />
       </div>
+    
+      <div class="info">
 
-      <p>{{bio}}</p>
+        <h2>{{firstname}} {{lastname}}</h2>
 
-      <p class="joined">Member since</p>
-      <!-- <p>Member since {{ month }} {{ year }}</p> -->
-      
-      
+        <div class="location">
+          <MapPin />
+          {{location}}
+        </div>
+
+        <p>{{bio}}</p>
+
+        <p class="joined">Member since</p>
+        <!-- <p>Member since {{ month }} {{ year }}</p> -->
+
+
+
+      </div>
 
     </div>
 
@@ -65,11 +72,13 @@ defineProps([
         </div>
       </div>
 
-      <button><Users fill="currentColor"/> Following</button>
-      
+      <button v-if="isFollowing == true">
+        <Users fill="currentColor" /> Following
+      </button>
+
     </div>
 
-    
+
   </div>
 </template>
 
@@ -101,13 +110,18 @@ defineProps([
 
 .userProfileCtn button:hover{ 
 
-  background-color:rgb(43, 173, 17);
+  background-color:rgb(59, 223, 26);
 }
 
 .location{
   display: flex;
   gap: 4px;
   color: #a4a5a4;
+}
+
+.picAndInfo{
+  display: flex;
+  gap: 40px;
 }
 
 .info{
@@ -164,6 +178,23 @@ defineProps([
 .joined{
   font-size: 0.8rem;
   color: #4f4e4e;
+}
+
+.picAndInfo .thumbnail {
+  width: 180px;
+  height: 180px;
+  overflow: hidden;
+  border-radius: 9999px;
+  font-size: 0.6rem;
+
+}
+
+.picAndInfo .thumbnail img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+
 }
 
 </style>
