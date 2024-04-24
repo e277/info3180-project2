@@ -1,10 +1,14 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import {useRoute} from "vue-router";
+import UserProfileHeader from "../components/UserProfileHeader.vue";
 
 let profile = ref([]);
+let posts = ref([])
 
-// const userId = localStorage.getItem('user_id');  TODO: uncomment
-let userId = 4;
+const route = useRoute();
+
+let userId = route.params.user_id;
 const token = localStorage.getItem('jwt_token');
 
 
@@ -21,8 +25,8 @@ function fetchProfile() {
     })
     .then(response => response.json())
     .then(data => {
-        profile.value = data.posts; 
-        console.log(data)
+        posts.value = data.posts; 
+        profile.value = data.user_info; 
     })
     .catch(error => {
         console.error(error);
@@ -34,9 +38,30 @@ function fetchProfile() {
 
 <template>
     <div class="pageWrapper">
+
+        <div class="profileCtn">
+
+            <UserProfileHeader
+                :firstname="profile.firstname"
+                :lastname="profile.lastname"
+                :location="profile.location"
+                :joinedOn="profile.joined_on"
+                :profilePic="profile.profile_photo"
+                :bio="profile.bio"
+                :followersCount="profile.followers_count"
+                :totalPosts="profile.total_posts"
+            
+            
+            />
+        </div>
     </div>
 </template>
 
 <style>
+
+.profileCtn{
+    width: 100%;
+    max-width: 1300px;
+}
 
 </style>

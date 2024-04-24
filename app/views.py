@@ -191,17 +191,41 @@ def get_posts(user_id):
             if post.photo in photos:
                 post.photo = url_for('uploaded_photo', photo=post.photo)
             
-            posts_count = Post.query.filter_by(user_id=user_id).count()
+            
+            #get username and user profile photo based on user id
+            user_data = db.session.query(User.profile_photo, User.username) \
+                        .join(Post, Post.user_id == User.id) \
+                        .filter(Post.id == post.id) \
+                        .first()
+            
+            profile_photo, username = user_data
             
             posts.append({
                 "id": post.id,
-                "user_id": post.user_id,
+                # "user_id": post.user_id,
                 "photo": post.photo,
-                "caption": post.caption,
-                "created_on": post.created_on,
-                "total_posts": posts_count
+                # "caption": post.caption,
+                # "created_on": post.created_on,
+                # "total_posts": posts_count
             })
-        return jsonify(posts=posts), 200
+
+        followers_count = Follow.query.filter_by(user_id=user_id).count()
+        posts_count = Post.query.filter_by(user_id=user_id).count()
+        user = User.query.get(user_id)
+
+        user_info = {
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "location": user.location,
+            "joined_on": user.joined_on,
+            "bio": user.biography,
+            "profile_photo": user.profile_photo,
+            "followers_count": followers_count,
+            "total_posts": posts_count
+        }
+
+        
+        return jsonify(posts=posts, user_info=user_info), 200
     else:
         return jsonify(message="No posts found for user"), 200
 
