@@ -72,9 +72,16 @@ defineProps([
         </div>
       </div>
 
-      <button v-if="isFollowing == true">
-        <Users fill="currentColor" /> Following
-      </button>
+      <div v-if="isFollowing != 'same user'">
+
+        <button v-if="isFollowing == true">
+          <Users fill="currentColor" /> Following
+        </button>
+
+        <button v-else="isFollowing == true">
+          <Users fill="currentColor" /> Follow
+        </button>
+      </div>
 
     </div>
 
@@ -141,7 +148,7 @@ defineProps([
 .metrics{
   display: flex;
   justify-content: space-between;
-  gap: 5px;
+  gap: 75px;
 }
 
 

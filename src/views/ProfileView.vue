@@ -51,7 +51,7 @@ function fetchProfile() {
                 :bio="profile.bio"
                 :followersCount="profile.followers_count"
                 :totalPosts="profile.total_posts"
-                :isFollowing="isFollowing"
+                :isFollowing="profile.isFollowing"
             
             />
 

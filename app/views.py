@@ -216,9 +216,13 @@ def get_posts(user_id):
 
         #is following
         #TODO: fake user id
-        fake_current_user_id = 1
-        count = Follow.query.filter_by(follower_id=fake_current_user_id, user_id=user.user_id).first()
-        isFollowing = count > 0
+        current_user_id = 1
+
+        if(current_user_id == user.id):
+            isFollowing = "same user"
+        else:
+            count = Follow.query.filter_by(follower_id=current_user_id, user_id=user.id).first()
+            isFollowing = count is not None
 
         user_info = {
             "firstname": user.firstname,
