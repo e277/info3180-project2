@@ -14,7 +14,7 @@
               <RouterLink class="nav-link" to="/explore">Explore</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link active" to="/">MyProfile</RouterLink>
+              <RouterLink class="nav-link active" to="/profile/1">MyProfile</RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink class="nav-link active" to="/logout">Logout</RouterLink>
@@ -27,6 +27,17 @@
 </template>
 
 <script setup>
+
+import { useRouter } from 'vue-router';
+
+let userId = 1;
+const router = useRouter();
+
+if (localStorage.getItem('user_id') && localStorage.getItem('user_id') !== undefined) {
+  userId = localStorage.getItem('user_id');
+}else{
+  router.push('/login');
+}
 
 </script>
 

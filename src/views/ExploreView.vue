@@ -20,7 +20,7 @@ function fetchPosts() {
     })
     .then(response => response.json())
     .then(data => {
-        allPosts.value = data.posts; // Assign the posts data directly to allPosts.value
+        allPosts.value = data.posts; 
     })
     .catch(error => {
         console.error(error);

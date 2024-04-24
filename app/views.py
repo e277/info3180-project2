@@ -179,7 +179,7 @@ def add_posts(user_id):
         return jsonify(errors=form_errors(form)), 400
 
 @app.route('/api/v1/users/<int:user_id>/posts', methods=['GET'])
-@requires_auth
+# @requires_auth TODO: uncomment
 def get_posts(user_id):
     # Returns a user's posts
     user_posts = Post.query.filter_by(user_id=user_id).all()
