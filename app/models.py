@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Post(db.Model):
     __tablename__ = "posts"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     caption = db.Column(db.String(80))
     photo = db.Column(db.String(80))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -17,7 +17,7 @@ class Post(db.Model):
 
 class User(db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(128))
     firstname = db.Column(db.String(80))
@@ -58,7 +58,7 @@ class User(db.Model):
 
 class Like(db.Model):
     __tablename__ = "likes"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
@@ -68,7 +68,7 @@ class Like(db.Model):
 
 class Follow(db.Model):
     __tablename__ = "follows"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 

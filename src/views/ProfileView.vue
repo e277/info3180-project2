@@ -43,6 +43,7 @@ function fetchProfile() {
         <div class="profileCtn">
 
             <UserProfileHeader
+                :id="profile.id"
                 :firstname="profile.firstname"
                 :lastname="profile.lastname"
                 :location="profile.location"

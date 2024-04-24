@@ -225,6 +225,7 @@ def get_posts(user_id):
             isFollowing = count is not None
 
         user_info = {
+            "id": user.id,
             "firstname": user.firstname,
             "lastname": user.lastname,
             "location": user.location,
@@ -241,12 +242,14 @@ def get_posts(user_id):
         return jsonify(message="No posts found for user"), 200
 
 @app.route('/api/users/<int:user_id>/follow', methods=['POST'])
-@requires_auth
+# @requires_auth TODO:put back auth
 def follow_user(user_id):
     # Create a Follow relationship between the current user and the target user.
-    current_user_id = g.current_user['sub']
-    if current_user_id == user_id:
-        return jsonify({'error': 'You cannot follow yourself'}), 400
+    # current_user_id = g.current_user['sub'] TODO: uncomment
+    current_user_id = 1
+    
+    # if current_user_id == user_id:
+    #     return jsonify({'error': 'You cannot follow yourself'}), 400
 
     target_user = User.query.get(user_id)
     if not target_user:
@@ -254,6 +257,8 @@ def follow_user(user_id):
 
     existing_follow = Follow.query.filter_by(follower_id=current_user_id, user_id=user_id).first()
     if existing_follow:
+        db.session.delete(existing_follow)
+        db.session.commit()
         return jsonify({'error': 'You are already following this user', 'following': True}), 200
 
     new_follow = Follow(follower_id=current_user_id, user_id=user_id)
@@ -317,17 +322,22 @@ def get_all_posts():
         return jsonify(message="No posts found"), 200
     
 @app.route('/api/v1/posts/<int:post_id>/like', methods=['POST'])
-@requires_auth
+# @requires_auth TODO:put back auth
 def like_post(post_id):
     # Set a like on the current Post by the logged in User
-    current_user_id = g.current_user['sub']
+    # current_user_id = g.current_user['sub'] TODO: uncomment
+    current_user_id = 1
+
     
     target_post = Post.query.get(post_id)
+    
     if not target_post:
         return jsonify({'error': 'Post not found'}), 400
 
     existing_like = Like.query.filter_by(post_id=post_id, user_id=current_user_id).first()
     if existing_like:
+        db.session.delete(existing_like)
+        db.session.commit()
         return jsonify({'error': 'You have already liked this post', 'liked': True}), 200
 
     new_like = Like(post_id=post_id, user_id=current_user_id)

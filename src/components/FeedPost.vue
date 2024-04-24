@@ -3,7 +3,8 @@
 import { ref } from "vue";
 import { Heart } from 'lucide-vue-next';
 
-defineProps([
+const props = defineProps([
+  "id",
   "profilePic",
   "userId",
   "username",
@@ -14,6 +15,41 @@ defineProps([
   "isLiked"
   
 ]);
+
+const likes = ref(props.likes);
+const isLiked = ref(props.isLiked);
+
+
+
+const token = localStorage.getItem('jwt_token');
+
+function likePost() {
+  fetch(`/api/v1/posts/${props.id}/like`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    },
+    
+  })
+    .then(response => response.json())
+    .then(data => {
+
+      if(data.message){
+        likes.value++;
+        isLiked.value = true;
+      }else{
+        likes.value--;
+        isLiked.value = false;
+      }
+      
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
 
 </script>
 
@@ -47,8 +83,8 @@ defineProps([
             
 
             <div class="like_ctn">
-              <Heart v-if="isLiked == false" color="#747474" class="like_icon"/>
-              <Heart v-else color="#ee3543" fill="#ee3543" class="like_icon"/>
+              <Heart v-if="isLiked == false" color="#747474" class="like_icon" @click="likePost"/>
+              <Heart v-else color="#ee3543" fill="#ee3543" class="like_icon" @click="likePost"/>
               
               
               <p> {{likes}} {{ likes === 1 ? 'Like' : 'Likes' }}</p>
@@ -106,6 +142,10 @@ defineProps([
   margin-right: 4px;
 }
 
+.like_icon:hover{
+  cursor: pointer;
+}
+
 
 .thumbnail {
   width: 50px;
@@ -123,6 +163,8 @@ defineProps([
   display: block;
 
 }
+
+
 
 .post_photo {
   width: 100%;
@@ -152,7 +194,7 @@ defineProps([
 }
 
 .profileLink:hover{
-  color: rgb(32, 168, 173);
+  color: rgb(32, 168, 173); 
 }
 
 

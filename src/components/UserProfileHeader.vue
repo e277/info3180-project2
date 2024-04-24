@@ -4,7 +4,7 @@ import { computed, ref } from "vue";
 import { Users, MapPin } from 'lucide-vue-next';
 
 const props = defineProps([
-  
+  "id",
   "firstname",
   "lastname",
   "location",
@@ -16,6 +16,10 @@ const props = defineProps([
   "isFollowing"
 ]);
 
+const followersCount = ref(props.followersCount);
+const isFollowing = ref(props.isFollowing);
+
+
 let date = computed(() => {
 
   let dateObj = new Date(props.joinedOn);
@@ -25,7 +29,35 @@ let date = computed(() => {
   return [month, year]
 })
 
+const token = localStorage.getItem('jwt_token');
 
+function follow() {
+  fetch(`/api/users/${props.id}/follow`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    },
+    
+  })
+    .then(response => response.json())
+    .then(data => {
+
+      if(data.message){
+        followersCount.value++;
+        isFollowing.value = true;
+      }else{
+        followersCount.value--;
+        isFollowing.value = false;
+      }
+      
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
 </script>
 
 
@@ -49,7 +81,6 @@ let date = computed(() => {
 
         <p>{{bio}}</p>
 
-        <!-- <p class="joined">Member since</p> -->
         <p>Member since {{date[0]}} {{date[1]}}</p>
 
 
@@ -72,18 +103,18 @@ let date = computed(() => {
         <div>
 
           <h3 class="count">{{followersCount}}</h3>
-          <h3>{{ followersCount === 1 ? 'Follower' : 'Followers' }}</h3>
+          <h3>{{followersCount === 1 ? 'Follower' : 'Followers' }}</h3>
 
         </div>
       </div>
 
-      <div v-if="isFollowing != 'same user'">
+      <div v-if="props.isFollowing != 'same user'">
 
-        <button v-if="isFollowing == true">
+        <button v-if="isFollowing == true" @click="follow">
           <Users fill="currentColor" /> Following
         </button>
 
-        <button v-else="isFollowing == true">
+        <button v-else class="followBtn" @click="follow">
           <Users fill="currentColor" /> Follow
         </button>
       </div>
@@ -122,8 +153,10 @@ let date = computed(() => {
 
 .userProfileCtn button:hover{ 
 
-  background-color:rgb(59, 223, 26);
+  background-color:rgb(45, 188, 16);
 }
+
+
 
 .location{
   display: flex;

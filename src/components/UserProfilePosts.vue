@@ -1,7 +1,5 @@
 <script setup>
 
-import { ref } from "vue";
-import { Heart } from 'lucide-vue-next';
 
 defineProps([
   "id",

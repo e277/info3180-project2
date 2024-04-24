@@ -41,6 +41,7 @@ function fetchPosts() {
             </div>
 
             <FeedPost v-for="post in allPosts" :key="post.user_id"
+                :id="post.id"
                 :userId="post.user_id"
                 :profilePic="post.profile_pic"
                 :username="post.username"
