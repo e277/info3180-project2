@@ -42,13 +42,14 @@
                     </p>
                 </div>
             </div>        
-        </form>
+        </form>    
     </div>
 </template>
 
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import router from '../router/index.js';
 
 const username = ref('');
 const password = ref('');
@@ -76,7 +77,7 @@ function getCsrfToken() {
     })
   };
 
-function registerUser() {
+  function registerUser() {
     let registerForm = document.getElementById('registerForm');
     let userData = new FormData(registerForm);
     
@@ -87,12 +88,19 @@ function registerUser() {
             'X-CSRFToken': csrf_token.value
         }        
     })
-    .then(response => response.json())
-    
-    .then(data => {
-        console.log(data);
+    .then(function (response){
+        return response.json();
     })
-    .catch(error => console.error('Error:', error));
+    .then(function (data) { 
+        console.log(data);
+        alert("Registration successful!");
+        router.push('/profile/:user_id');      
+    })
+    .catch(function (error){
+        console.log(error);
+        alert("Registration failed.");
+        router.push('/register');
+    });
 };
 
 function handleFileUpload(event){
