@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed, ref, onMounted, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { Users, MapPin } from 'lucide-vue-next';
 
 const props = defineProps([

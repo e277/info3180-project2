@@ -10,12 +10,12 @@ let allPosts = ref([]);
 const token = localStorage.getItem('jwt_token');
 
 onMounted(() => {
-    //if(token != "undefined"){
+    if(token != "undefined"){
         
         fetchPosts();
-    // }else{
-    //     router.push('/login');
-    // }
+    }else{
+        router.push('/login');
+    }
     
 })
 

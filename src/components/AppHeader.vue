@@ -30,15 +30,16 @@
 <script setup>
 
 
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watchEffect } from "vue";
 // import { useRouter } from "vue-router";
 
 
 // const router = useRouter();
-let loaded = ref(false);
-let link = ref();
+const loaded = ref(false);
+const link = ref();
 
-// const token = localStorage.getItem('jwt_token');
+// const token = ref();
+// token.value = localStorage.getItem('jwt_token');
 
 
 // function setLink(){
@@ -59,6 +60,10 @@ onMounted(() => {
 
 });
 
+// watchEffect(() => {
+//   followersCount.value = props.followersCount;
+//   isFollowing.value = props.isFollowing;
+// });
 
 
 
