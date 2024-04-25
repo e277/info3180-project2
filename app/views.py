@@ -179,7 +179,7 @@ def add_posts(user_id):
         return jsonify(errors=form_errors(form)), 400
 
 @app.route('/api/v1/users/<int:user_id>/posts', methods=['GET'])
-# @requires_auth TODO: uncomment
+@requires_auth 
 def get_posts(user_id):
     # Returns a user's posts
     user_posts = Post.query.filter_by(user_id=user_id).all()
@@ -203,11 +203,7 @@ def get_posts(user_id):
             
             posts.append({
                 "id": post.id,
-                # "user_id": post.user_id,
                 "photo": post.photo,
-                # "caption": post.caption,
-                # "created_on": post.created_on,
-                # "total_posts": posts_count
             })
 
         followers_count = Follow.query.filter_by(user_id=user_id).count()
@@ -215,8 +211,7 @@ def get_posts(user_id):
         user = User.query.get(user_id)
 
         #is following
-        #TODO: fake user id
-        current_user_id = 1
+        current_user_id = g.current_user['sub']
 
         if(current_user_id == user.id):
             isFollowing = "same user"
@@ -242,14 +237,11 @@ def get_posts(user_id):
         return jsonify(message="No posts found for user"), 200
 
 @app.route('/api/users/<int:user_id>/follow', methods=['POST'])
-# @requires_auth TODO:put back auth
+@requires_auth 
 def follow_user(user_id):
     # Create a Follow relationship between the current user and the target user.
-    # current_user_id = g.current_user['sub'] TODO: uncomment
-    current_user_id = 1
+    current_user_id = g.current_user['sub']
     
-    # if current_user_id == user_id:
-    #     return jsonify({'error': 'You cannot follow yourself'}), 400
 
     target_user = User.query.get(user_id)
     if not target_user:
@@ -279,7 +271,7 @@ def follow_user(user_id):
     }), 201
 
 @app.route('/api/v1/posts', methods=['GET'])
-# @requires_auth TODO: uncomment
+@requires_auth 
 def get_all_posts():
     # Return all posts for all users
     posts = Post.query.all()
@@ -303,10 +295,9 @@ def get_all_posts():
             likes = Like.query.filter_by(post_id=post.id).count()
 
 
-            #did the current user like this?
-            #TODO: fake user id
-            fake_current_user = 1
-            is_liked = Like.query.filter_by(post_id=post.id, user_id=fake_current_user).first()
+            
+            current_user_id = g.current_user['sub']
+            is_liked = Like.query.filter_by(post_id=post.id, user_id=current_user_id).first()
             isLiked = bool(is_liked)
                         
             all_posts.append({
@@ -326,13 +317,11 @@ def get_all_posts():
         return jsonify(message="No posts found"), 200
     
 @app.route('/api/v1/posts/<int:post_id>/like', methods=['POST'])
-# @requires_auth TODO:put back auth
+@requires_auth
 def like_post(post_id):
     # Set a like on the current Post by the logged in User
-    # current_user_id = g.current_user['sub'] TODO: uncomment
-    current_user_id = 1
-
-    
+    current_user_id = g.current_user['sub'] 
+     
     target_post = Post.query.get(post_id)
     
     if not target_post:
@@ -411,7 +400,6 @@ def add_header(response):
     return response
 
 #TODO: uncomment
-
 # @app.errorhandler(404)
 # def page_not_found(error):
 #     """Custom 404 page."""
