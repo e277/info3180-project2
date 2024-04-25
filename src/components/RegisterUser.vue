@@ -59,6 +59,7 @@ const email = ref('');
 const location = ref('');
 const biography = ref('');
 const profile_photo = ref(null);
+const errorMessage = ref('');
 
 let csrf_token = ref("")
 
@@ -75,12 +76,35 @@ function getCsrfToken() {
         console.log(data);
         csrf_token.value = data.csrf_token;
     })
-  };
+    .catch(error => console.error('Error fetching CSRF token:', error));
+  }
 
-  function registerUser() {
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function registerUser() {
+    if (!username.value || !password.value || !firstname.value || !lastname.value || !email.value || !location.value) {
+        errorMessage.value = 'Please fill out all required fields';
+        return;
+    }
+
+    if (!isValidEmail(email.value)) {
+        errorMessage.value = 'Invalid email address';
+        return;
+    }
+
     let registerForm = document.getElementById('registerForm');
     let userData = new FormData(registerForm);
     
+    if (biography.value === '' || biography.value === null) {
+        userData.delete('biography');
+    }
+    if (profile_photo.value === '' || profile_photo.value === null) {
+        userData.delete('profile_photo');
+    }
+
     fetch('/api/v1/register', {
         method: 'POST',
         body: userData,
@@ -88,20 +112,23 @@ function getCsrfToken() {
             'X-CSRFToken': csrf_token.value
         }        
     })
-    .then(function (response){
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Registration failed.');
+        }
         return response.json();
     })
     .then(function (data) { 
         console.log(data);
         alert("Registration successful!");
-        router.push('/profile/:user_id');      
+        router.push('/profile/' + data.user_id);
     })
     .catch(function (error){
-        console.log(error);
+        console.error('Error:', error);
         alert("Registration failed.");
         router.push('/register');
     });
-};
+}
 
 function handleFileUpload(event){
     const file = event.target.files[0];

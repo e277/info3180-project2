@@ -26,7 +26,7 @@ const logout = async () => {
       method: 'POST',
     });
     if (response.ok) {
-      router.push({ path: '/login' });
+      router.push({ path: '/' });
     } else {
       console.error('Logout failed:', response.statusText);
       alert('Logout failed. Please try again later.');

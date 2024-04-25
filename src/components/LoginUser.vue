@@ -62,6 +62,9 @@ function login() {
         body: JSON.stringify(loginData),
     })
     .then(response => {
+        if (!response.ok) {
+            throw new Error('Invalid username or password.');
+        }
         return response.json();
     })
     .then(data => {
@@ -69,10 +72,11 @@ function login() {
         localStorage.setItem('jwt_token', data.jwt_token);
         localStorage.setItem('user_id', data.user_id);
         alert('Login Successful!');
-        router.push('/explore');
+        router.push('/profile/' + data.user_id);
     })
     .catch(error => {
-        console.log("[Login Error]: ", error);
+        //console.log("[Login Error]: ", error);
+        console.error('Login Error:', error);
         alert(error.message);
         router.push('/login');
     });
