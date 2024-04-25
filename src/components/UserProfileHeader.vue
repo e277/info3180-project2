@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed, ref, onMounted } from "vue";
+import { computed, ref, onMounted, watchEffect } from "vue";
 import { Users, MapPin } from 'lucide-vue-next';
 
 const props = defineProps([
@@ -17,8 +17,10 @@ const props = defineProps([
 ]);
 
 
-const followersCount = ref(props.followersCount);
-const isFollowing = ref(props.isFollowing);
+let followersCount = ref(props.followersCount);
+let isFollowing = ref(props.isFollowing);
+
+
 
 
 let date = computed(() => {
@@ -60,7 +62,10 @@ function followUser() {
     });
 }
 
-
+watchEffect(() => {
+  followersCount.value = props.followersCount;
+  isFollowing.value = props.isFollowing;
+});
 
 </script>
 
@@ -106,7 +111,7 @@ function followUser() {
 
         <div>
 
-          <h3 class="count">{{followersCount}}</h3>
+          <h3 class="count" >{{followersCount}}</h3>
           <h3>{{followersCount === 1 ? 'Follower' : 'Followers' }}</h3>
 
         </div>
