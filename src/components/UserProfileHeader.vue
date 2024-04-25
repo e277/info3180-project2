@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { Users, MapPin } from 'lucide-vue-next';
 
 const props = defineProps([
@@ -15,6 +15,7 @@ const props = defineProps([
   "followersCount",
   "isFollowing"
 ]);
+
 
 const followersCount = ref(props.followersCount);
 const isFollowing = ref(props.isFollowing);
@@ -31,7 +32,7 @@ let date = computed(() => {
 
 const token = localStorage.getItem('jwt_token');
 
-function follow() {
+function followUser() {
   fetch(`/api/users/${props.id}/follow`, {
     method: 'POST',
     headers: {
@@ -46,10 +47,10 @@ function follow() {
     .then(data => {
 
       if(data.message){
-        followersCount.value++;
+        followersCount.value = data.follower_count;
         isFollowing.value = true;
       }else{
-        followersCount.value--;
+        followersCount.value = data.follower_count;
         isFollowing.value = false;
       }
       
@@ -58,6 +59,9 @@ function follow() {
       console.error(error);
     });
 }
+
+
+
 </script>
 
 
@@ -110,11 +114,11 @@ function follow() {
 
       <div v-if="props.isFollowing != 'same user'">
 
-        <button v-if="isFollowing == true" @click="follow">
+        <button v-if="isFollowing == true" @click="followUser">
           <Users fill="currentColor" /> Following
         </button>
 
-        <button v-else class="followBtn" @click="follow">
+        <button v-else class="followBtn" @click="followUser">
           <Users fill="currentColor" /> Follow
         </button>
       </div>

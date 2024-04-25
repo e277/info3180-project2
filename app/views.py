@@ -255,18 +255,22 @@ def follow_user(user_id):
     if not target_user:
         return jsonify({'error': 'User not found'}), 404
 
+
+    # Assuming a followers relationship defined through Follow model or similar approach
+    follower_count = Follow.query.filter_by(user_id=user_id).count()
+    
     existing_follow = Follow.query.filter_by(follower_id=current_user_id, user_id=user_id).first()
     if existing_follow:
         db.session.delete(existing_follow)
         db.session.commit()
-        return jsonify({'error': 'You are already following this user', 'following': True}), 200
+        follower_count = follower_count - 1
+        return jsonify({'error': 'You are already following this user', 'following': True, 'follower_count': follower_count}), 200
 
     new_follow = Follow(follower_id=current_user_id, user_id=user_id)
     db.session.add(new_follow)
     db.session.commit()
+    follower_count = follower_count + 1
 
-    # Assuming a followers relationship defined through Follow model or similar approach
-    follower_count = Follow.query.filter_by(user_id=user_id).count()
 
     return jsonify({
         'message': 'You are now following {}'.format(target_user.username),

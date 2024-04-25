@@ -1,6 +1,7 @@
 <template>
-  <header>
+  <header v-if="loaded">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+
       <div class="container-fluid">
         <a class="navbar-brand" href="/">
           <span class="navbar-brand"><img src="../assets/cam.png" alt="Photogram Logo" width="30" height="30" class="d-inline-block align-top">Photogram</span>
@@ -14,7 +15,7 @@
               <RouterLink class="nav-link active" to="/explore">Explore</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link active" to="/profile/1">MyProfile</RouterLink>
+              <RouterLink class="nav-link active" :to="link">MyProfile</RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink class="nav-link active" to="/logout">Logout</RouterLink>
@@ -28,20 +29,45 @@
 
 <script setup>
 
-// import { useRouter } from 'vue-router';
 
-// let userId = 1;
+import { ref, onMounted, watch } from "vue";
+// import { useRouter } from "vue-router";
+
+
 // const router = useRouter();
+let loaded = ref(false);
+let link = ref();
 
-// if (localStorage.getItem('user_id') && localStorage.getItem('user_id') !== undefined) {
-//   userId = localStorage.getItem('user_id');
-// }else{
-//   router.push('/login');
+// const token = localStorage.getItem('jwt_token');
+
+
+// function setLink(){
+//   if (token && token != "undefined") {
+//     link.value = '/profile/' + localStorage.getItem('user_id');
+//     link.value = '/profile/' + 2;
+//     loaded.value = true;
+//   } else {
+//     loaded.value = true;
+//     router.push('/login');
+//   }
 // }
+
+onMounted(() => {
+  link.value = '/profile/' + 2;
+  loaded.value = true;
+  //setLink();
+
+});
+
+
+
 
 </script>
 
 <style>
+    header{
+      position: relative;
+    }
     .container-fluid{
         display:flex;
         flex-direction:row;
@@ -86,6 +112,16 @@
         display: inline-flex;
         align-items: center;
         margin-right:1px;
+
+    }
+
+    .signinMessage{
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      background-color: #1a1a1a;
+      padding: 0.5rem 0.9rem;
+      border-radius: 100px;
 
     }
 </style>

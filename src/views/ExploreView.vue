@@ -2,13 +2,21 @@
 import { ref, onMounted } from "vue";
 import FeedPost from "../components/FeedPost.vue";
 import { Plus } from 'lucide-vue-next';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 let allPosts = ref([]);
 
 const token = localStorage.getItem('jwt_token');
 
 onMounted(() => {
-    fetchPosts();
+    //if(token != "undefined"){
+        
+        fetchPosts();
+    // }else{
+    //     router.push('/login');
+    // }
+    
 })
 
 function fetchPosts() {

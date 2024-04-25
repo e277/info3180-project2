@@ -14,7 +14,9 @@ const token = localStorage.getItem('jwt_token');
 
 
 onMounted(() => {
+   
     fetchProfile();
+  
 })
 
 function fetchProfile() {
