@@ -31,11 +31,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="biography" class="form-label bold">Biography</label>
-                            <textarea class="form-control border1" name="biography" rows="3" v-model="biography"></textarea>
+                            <textarea class="form-control border1" name="biography" rows="3" v-model="biography" required></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="profile_photo" class="form-label bold">Photo</label>
-                            <input class="form-control border1" type="file" id="profile_photo" name="profile_photo" @change="handleFileUpload" accept="image/*">
+                            <input class="form-control border1" type="file" id="profile_photo" name="profile_photo" @change="handleFileUpload" accept="image/*" required>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block">Register</button>
@@ -59,7 +59,6 @@ const email = ref('');
 const location = ref('');
 const biography = ref('');
 const profile_photo = ref(null);
-const errorMessage = ref('');
 
 let csrf_token = ref("")
 
@@ -79,31 +78,9 @@ function getCsrfToken() {
     .catch(error => console.error('Error fetching CSRF token:', error));
   }
 
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
 function registerUser() {
-    if (!username.value || !password.value || !firstname.value || !lastname.value || !email.value || !location.value) {
-        errorMessage.value = 'Please fill out all required fields';
-        return;
-    }
-
-    if (!isValidEmail(email.value)) {
-        errorMessage.value = 'Invalid email address';
-        return;
-    }
-
     let registerForm = document.getElementById('registerForm');
     let userData = new FormData(registerForm);
-    
-    if (biography.value === '' || biography.value === null) {
-        userData.delete('biography');
-    }
-    if (profile_photo.value === '' || profile_photo.value === null) {
-        userData.delete('profile_photo');
-    }
 
     fetch('/api/v1/register', {
         method: 'POST',
@@ -124,7 +101,7 @@ function registerUser() {
         router.push('/profile/' + data.user_id);
     })
     .catch(function (error){
-        console.error('Error:', error);
+        console.log(error);
         alert("Registration failed.");
         router.push('/register');
     });
