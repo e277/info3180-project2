@@ -36,4 +36,3 @@ venv
 .env
 .flaskenv
 
-*.jpg
