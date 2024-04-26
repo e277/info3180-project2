@@ -155,7 +155,13 @@ watchEffect(() => {
 .userProfileCtn button{
   max-width: 200px;
   border: none;
-  background-color:rgb(48, 225, 11);
+  background-color: rgb(48, 225, 11);
+  color: white;
+  padding: 0.7rem;
+  border-radius: 10px;
+  width: 100%;
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .userProfileCtn button:hover{ 
