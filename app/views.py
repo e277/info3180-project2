@@ -186,6 +186,8 @@ def add_posts(user_id):
 @app.route('/api/v1/users/<int:user_id>/posts', methods=['GET'])
 @requires_auth 
 def get_posts(user_id):
+
+
     # Returns a user's posts
     user_posts = Post.query.filter_by(user_id=user_id).all()
     posts = []
@@ -239,7 +241,35 @@ def get_posts(user_id):
 
         return jsonify(posts=posts, user_info=user_info), 200
     else:
-        return jsonify(message="No posts found for user"), 200
+
+        #return user info even when they dont have posts
+        followers_count = Follow.query.filter_by(user_id=user_id).count()
+        user = User.query.get(user_id)
+
+        #is following
+        current_user_id = g.current_user['sub']
+
+        if(current_user_id == user.id):
+            isFollowing = "same user"
+        else:
+            count = Follow.query.filter_by(follower_id=current_user_id, user_id=user.id).first()
+            isFollowing = count is not None
+
+        user_info = {
+            "id": user.id,
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "location": user.location,
+            "joined_on": user.joined_on,
+            "bio": user.biography,
+            "profile_photo": url_for('uploaded_photo', photo=user.profile_photo),
+            "followers_count": followers_count,
+            "total_posts": 0,
+            "isFollowing": isFollowing
+        }
+
+
+        return jsonify(posts=[], user_info=user_info), 200
 
 @app.route('/api/users/<int:user_id>/follow', methods=['POST'])
 @requires_auth 

@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import {useRoute} from "vue-router";
 import UserProfileHeader from "../components/UserProfileHeader.vue";
 import UserProfilePosts from "../components/UserProfilePosts.vue";
+import { Images } from "lucide-vue-next";
 
 let profile = ref([]);
 let posts = ref([])
@@ -59,6 +60,13 @@ function fetchProfile() {
             
             />
 
+            <div v-if="posts.length == 0" class="no-posts-yet-ctn">
+                <Images size="100" stroke-width="1.3"/>
+                
+                Hmmm.... seems like this user doesn't have any posts yet
+            
+            </div>
+
             <div class="postGrid">
 
                 <UserProfilePosts v-for="post in posts" :key="post.id"
@@ -84,6 +92,15 @@ function fetchProfile() {
     display: grid;
     grid-template-columns: repeat(3, 1fr); 
     grid-gap: 7px; 
+}
+
+.no-posts-yet-ctn{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: rgb(147, 161, 164);
 }
 
 </style>
