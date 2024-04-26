@@ -121,7 +121,7 @@ function registerUser() {
     .then(function (data) { 
         console.log(data);
         alert("Registration successful!");
-        router.push('/profile/' + data.user_id);
+        router.push('/login');
     })
     .catch(function (error){
         console.error('Error:', error);

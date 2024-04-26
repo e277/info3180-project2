@@ -26,6 +26,8 @@ const logout = async () => {
       method: 'POST',
     });
     if (response.ok) {
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('user_id');
       router.push({ path: '/' });
     } else {
       console.error('Logout failed:', response.statusText);
@@ -38,7 +40,7 @@ const logout = async () => {
 };
 
 const cancel = () => {
-  router.push({ path: '/' });
+  router.back();
 };
 </script>
 

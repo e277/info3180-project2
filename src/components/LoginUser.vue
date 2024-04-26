@@ -68,11 +68,11 @@ function login() {
         return response.json();
     })
     .then(data => {
-        console.log(data);
+        // console.log(data);
         localStorage.setItem('jwt_token', data.jwt_token);
         localStorage.setItem('user_id', data.user_id);
         alert('Login Successful!');
-        router.push('/profile/' + data.user_id);
+        router.push('/explore');
     })
     .catch(error => {
         //console.log("[Login Error]: ", error);
