@@ -31,32 +31,32 @@
 
 
 import { ref, onMounted, watchEffect } from "vue";
-// import { useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 
-// const router = useRouter();
+const router = useRouter();
 const loaded = ref(false);
 const link = ref();
 
-// const token = ref();
-// token.value = localStorage.getItem('jwt_token');
+const token = ref();
+token.value = localStorage.getItem('jwt_token');
 
 
-// function setLink(){
-//   if (token && token != "undefined") {
-//     link.value = '/profile/' + localStorage.getItem('user_id');
-//     link.value = '/profile/' + 2;
-//     loaded.value = true;
-//   } else {
-//     loaded.value = true;
-//     router.push('/login');
-//   }
-// }
+function setLink(){
+  if (token && token != "undefined") {
+    link.value = '/profile/' + localStorage.getItem('user_id');
+    // link.value = '/profile/' + 2;
+    loaded.value = true;
+  } else {
+    loaded.value = true;
+    router.push('/login');
+  }
+}
 
 onMounted(() => {
-  link.value = '/profile/' + 2;
+  link.value = '/profile/' + localStorage.getItem('user_id');
   loaded.value = true;
-  //setLink();
+  setLink();
 
 });
 

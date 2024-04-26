@@ -39,9 +39,7 @@ function followUser() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      'Authorization': `Bearer ${token}`
     },
     
   })
@@ -68,7 +66,7 @@ watchEffect(() => {
 });
 
 </script>
-
+ 
 
 <template>
   <div class="userProfileCtn">

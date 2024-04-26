@@ -152,6 +152,7 @@ def load_user(id):
 @app.route('/api/v1/users/<int:user_id>/posts', methods=['POST'])
 @requires_auth
 def add_posts(user_id):
+    current_user_id = g.current_user['sub']
     # Used for adding posts to the users feed
     form = PostForm()
     # get user id from authentication
@@ -162,19 +163,23 @@ def add_posts(user_id):
         photo = form.photo.data
         user_id = form.user_id.data
         
-        filename = secure_filename(photo.filename)
-        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        if current_user_id == user_id:
         
-        post = Post(caption=caption, photo=filename, user_id=user_id) 
-        db.session.add(post)
-        db.session.commit()
-        
-        post_data = {
-            "caption": post.caption,
-            "user_id": post.user_id
-        }
-        
-        return jsonify(message="Post added successfully", post=post_data), 201
+            filename = secure_filename(photo.filename)
+            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            post = Post(caption=caption, photo=filename, user_id=user_id) 
+            db.session.add(post)
+            db.session.commit()
+            
+            post_data = {
+                "caption": post.caption,
+                "user_id": post.user_id
+            }
+            
+            return jsonify(message="Post added successfully", post=post_data), 201
+        else:
+            return jsonify(message="Invalid User")
     else:
         return jsonify(errors=form_errors(form)), 400
 
@@ -288,6 +293,7 @@ def get_all_posts():
                         .join(Post, Post.user_id == User.id) \
                         .filter(Post.id == post.id) \
                         .first()
+                    
             
             profile_photo, username = user_data
 

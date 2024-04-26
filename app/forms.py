@@ -6,7 +6,7 @@ from wtforms.validators import InputRequired, Length, Email
 
 class PostForm(FlaskForm):
     caption = TextAreaField('Caption', validators=[InputRequired()])
-    photo = FileField('Photo', validators=[FileRequired(), FileAllowed(['jpg', 'png'], 'Images only!')])
+    photo = FileField('Photo', validators=[FileRequired(), FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!')])
     user_id = IntegerField('UserID', validators=[InputRequired()])
     
 class LikeForm(FlaskForm):
@@ -25,7 +25,7 @@ class UserForm(FlaskForm):
     email = StringField('Email', validators=[InputRequired()])
     location = StringField('Location', validators=[InputRequired()])
     biography = TextAreaField('Biography', validators=[InputRequired()])
-    profile_photo = FileField('ProfilePhoto', validators=[FileRequired(), FileAllowed(['jpg', 'png'], 'Images only!')])
+    profile_photo = FileField('ProfilePhoto', validators=[FileRequired(), FileAllowed(['jpg', 'jpeg', 'png'], 'Images only!')])
     
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])

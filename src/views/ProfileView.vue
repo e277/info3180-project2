@@ -28,6 +28,7 @@ function fetchProfile() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         posts.value = data.posts; 
         profile.value = data.user_info; 
     })

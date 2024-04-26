@@ -28,9 +28,7 @@ function likePost() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      'Authorization': `Bearer ${token}`
     },
     
   })
@@ -77,7 +75,8 @@ function likePost() {
         </div>
 
       <div class="feedPost">
-          <p class="caption">{{caption}} Creating memories by the seaside. Waves of laughter. Enjoying the tranquility of the ocean breeze and the warmth of the sun.</p>
+          <!-- <p class="caption">{{caption}} Creating memories by the seaside. Waves of laughter. Enjoying the tranquility of the ocean breeze and the warmth of the sun.</p> -->
+          <p class="caption">{{caption}}</p>
           
           <div class="post_footer">
             

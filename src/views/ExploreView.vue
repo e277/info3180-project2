@@ -28,6 +28,7 @@ function fetchPosts() {
     })
     .then(response => response.json())
     .then(data => {
+        
         allPosts.value = data.posts; 
     })
     .catch(error => {
