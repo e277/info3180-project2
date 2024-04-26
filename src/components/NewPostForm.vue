@@ -88,7 +88,7 @@ function onFileChange(event){
 </script>
 
 
-<style>
+<style scoped>
 form{
     background-color:#FFF8EB;
     margin-left:400px;
