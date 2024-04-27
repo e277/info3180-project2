@@ -31,9 +31,11 @@ import router from '../router/index.js';
 const username = ref('');
 const password = ref('');
 const csrf_token = ref("")
-
 onMounted(() => {
-  getCsrfToken();
+    getCsrfToken();
+    if (localStorage.getItem('jwt_token') != null){
+        router.push('/explore');
+    }  
 })
 
 function getCsrfToken() {
@@ -48,6 +50,7 @@ function getCsrfToken() {
   };
 
 function login() {
+
     const loginData = {
         username: username.value,
         password: password.value
@@ -72,7 +75,7 @@ function login() {
         localStorage.setItem('jwt_token', data.jwt_token);
         localStorage.setItem('user_id', data.user_id);
         alert('Login Successful!');
-        router.push('/explore');
+        router.go();
     })
     .catch(error => {
         //console.log("[Login Error]: ", error);

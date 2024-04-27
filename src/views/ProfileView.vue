@@ -15,9 +15,12 @@ const token = localStorage.getItem('jwt_token');
 
 
 onMounted(() => {
-   
+    if (!localStorage.getItem('jwt_token')) {
+    route.push('/login');
+    }   
+    else{
     fetchProfile();
-  
+    } 
 })
 
 function fetchProfile() {

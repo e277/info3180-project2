@@ -65,12 +65,17 @@ function savePost() {
             'Authorization': 'Bearer ' + token
         }
     })
-    .then(function (response){
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Invalid file format or caption missing.');
+        }
         return response.json();
     })
+
     .then(function (data) { 
         console.log(data);
-        alert("Post submitted successfully!");      
+        alert("Post submitted successfully!"); 
+        router.push('/profile/' + user_id);      
     })
     .catch(function (error){
         console.log(error);

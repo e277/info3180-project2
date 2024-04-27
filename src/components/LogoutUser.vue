@@ -20,6 +20,10 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
+if (localStorage.getItem('jwt_token') == null){
+        router.push('/');
+    } 
+
 const logout = async () => {
   try {
     const response = await fetch('/api/v1/auth/logout', {
@@ -28,7 +32,7 @@ const logout = async () => {
     if (response.ok) {
       localStorage.removeItem('jwt_token');
       localStorage.removeItem('user_id');
-      router.push({ path: '/' });
+      router.go();
     } else {
       console.error('Logout failed:', response.statusText);
       alert('Logout failed. Please try again later.');

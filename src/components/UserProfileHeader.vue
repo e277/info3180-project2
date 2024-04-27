@@ -2,6 +2,12 @@
 
 import { computed, ref, watchEffect } from "vue";
 import { Users, MapPin } from 'lucide-vue-next';
+import router from '../router/index.js';
+    
+if (!localStorage.getItem('jwt_token')) {
+    alert('You must be logged in.');
+    router.push('/login');
+}
 
 const props = defineProps([
   "id",

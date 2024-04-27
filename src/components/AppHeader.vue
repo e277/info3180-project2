@@ -18,7 +18,8 @@
               <RouterLink class="nav-link active" :to="link">MyProfile</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link active" to="/logout">Logout</RouterLink>
+              <RouterLink class="nav-link active" to="/logout" v-if="token" >Logout</RouterLink>
+              <RouterLink class="nav-link active" to="/login" v-else >Login</RouterLink>
             </li>
           </ul>
         </div>
@@ -43,21 +44,19 @@ token.value = localStorage.getItem('jwt_token');
 
 
 function setLink(){
-  if (token && token != "undefined") {
+  if (token.value != null) {
     link.value = '/profile/' + localStorage.getItem('user_id');
     // link.value = '/profile/' + 2;
     loaded.value = true;
   } else {
     loaded.value = true;
-    router.push('/login');
+    link.value = '/login/';
   }
 }
 
 onMounted(() => {
-  link.value = '/profile/' + localStorage.getItem('user_id');
   loaded.value = true;
   setLink();
-
 });
 
 // watchEffect(() => {
